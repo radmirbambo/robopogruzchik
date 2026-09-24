@@ -1,4 +1,4 @@
-const N = ' ';
+const N = ' ';
 const group = (n: number) => Math.round(Math.abs(n)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, N);
 const sign = (n: number) => (n < 0 ? '−' : '');
 const dec1 = (x: number) => { const r = Math.round(x * 10) / 10; return (Number.isInteger(r) ? String(r) : r.toFixed(1)).replace('.', ','); };
