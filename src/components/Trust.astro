@@ -1,0 +1,175 @@
+---
+// Доверие: MVP на реальном складе, разработка МФТИ, команда, роадмап.
+// Фото — из презентаций компании (scripts/extract-assets.sh), через astro:assets, лениво.
+import { Image } from 'astro:assets';
+import { num } from '../lib/format';
+import mvp1 from '../assets/mvp-1.jpg';
+import mvp2 from '../assets/mvp-2.jpg';
+import mvp3 from '../assets/mvp-3.jpg';
+import license from '../assets/license.jpg';
+import gavrilov from '../assets/team-gavrilov.jpg';
+import leus from '../assets/team-leus.jpg';
+import yakushkova from '../assets/team-yakushkova.jpg';
+import antipov from '../assets/team-antipov.jpg';
+import roshchin from '../assets/team-roshchin.jpg';
+import matalygin from '../assets/team-matalygin.jpg';
+
+// Первое фото на мобильном во всю ширину (квадрат), остальные — парой 3:4. pos — что оставить в кадре при обрезке.
+const photos = [
+  { src: mvp3, alt: 'Электротележка с ПАК «Беспилотный погрузчик»: блок управления и камеры на стойке', pos: '38% 50%' },
+  { src: mvp1, alt: 'Робот везёт паллеты по складу', pos: '50% 12%' },
+  { src: mvp2, alt: 'Робот с грузом на паллете в проходе между стеллажами', pos: '50% 60%' },
+];
+const stats = [
+  { value: '3', label: 'робота в масштабе 1:1' },
+  { value: num(1500), label: 'паллет в сутки' },
+  { value: '6%', label: 'уклон' },
+  { value: 'WMS', label: 'работа с действующей' },
+];
+const team = [
+  { img: gavrilov, name: 'Гаврилов Дмитрий', role: 'д.т.н., профессор МФТИ, научный руководитель' },
+  { img: leus, name: 'Леус Андрей', role: 'к.т.н., доцент МФТИ, CTO' },
+  { img: yakushkova, name: 'Якушкова Валентина', role: 'CEO' },
+  { img: antipov, name: 'Антипов Александр', role: 'аспирант МФТИ, разработка системного ПО' },
+  { img: roshchin, name: 'Рощин Никита', role: 'инженер-испытатель' },
+  { img: matalygin, name: 'Маталыгин Андрей', role: 'аспирант МФТИ, навигация и техзрение' },
+];
+const NOW = 2026;
+// U+00A0 держит число со словом, чтобы «3» или «100» не висели в конце строки
+const roadmap = [
+  { year: 2023, text: 'Модель и идея потолочной навигации' },
+  { year: 2024, text: 'Прототипы на 3 моделях тележек, 2 пилота' },
+  { year: 2025, text: 'Первые продажи и реальный проект, 5 роботов в работе' },
+  { year: 2026, text: `Первый сданный проект, запуск 10 роботов, ${num(100000)} паллет` },
+  { year: 2027, text: 'Серийное производство, 100 роботов' },
+  { year: 2028, text: `Массовое производство до ${num(1000)} роботов` },
+];
+---
+<section id="trust" class="border-t border-line py-20 md:py-28" aria-labelledby="trust-title">
+  <div class="container-x">
+    <p class="tag">// Доверие</p>
+    <h2 id="trust-title" class="trust-title mt-4 max-w-[900px] font-bold text-balance md:mt-5">Сделано в МФТИ. Проверено на складе</h2>
+
+    <!-- 01 · MVP -->
+    <div class="block-grid mt-10 md:mt-14">
+      <div>
+        <p class="idx" aria-hidden="true">01</p>
+        <h3 class="sub-title mt-3 font-bold">Работает на реальном складе</h3>
+        <ul class="mt-6 grid grid-cols-2 border-t border-line md:grid-cols-4 lg:mt-8 lg:grid-cols-2">
+          {stats.map((s) => (
+            <li class="stat min-w-0 border-b border-line py-4 pr-3">
+              <b class="block font-display text-[28px] leading-none font-bold whitespace-nowrap md:text-[32px]">{s.value}</b>
+              <span class="mt-2 block font-mono text-[10px] leading-snug tracking-[.06em] text-mut uppercase">{s.label}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+      <ul class="mvp-photos grid grid-cols-2 gap-2 md:grid-cols-3 md:gap-3">
+        {photos.map((p, i) => (
+          <li class:list={['overflow-hidden bg-bg2', i === 0 ? 'col-span-2 aspect-square md:col-span-1 md:aspect-[3/4]' : 'aspect-[3/4]']}>
+            <Image src={p.src} alt={p.alt} widths={[240, 480, 720]}
+              sizes={i === 0 ? '(min-width: 1024px) 220px, (min-width: 768px) 32vw, 100vw' : '(min-width: 1024px) 220px, (min-width: 768px) 32vw, 50vw'}
+              class="size-full object-cover" style={`object-position:${p.pos}`} loading="lazy" decoding="async" />
+          </li>
+        ))}
+      </ul>
+    </div>
+
+    <!-- 02 · МФТИ -->
+    <div class="block-grid sub-block">
+      <div>
+        <p class="idx" aria-hidden="true">02</p>
+        <h3 class="sub-title mt-3 font-bold">Разработка МФТИ</h3>
+        <p class="mt-5 max-w-[420px] text-base leading-relaxed text-pretty text-mut md:text-[17px]">Исключительная лицензия МФТИ, собственные патенты и&nbsp;свидетельства на&nbsp;ПО</p>
+      </div>
+      <div class="border border-line bg-bg2">
+        <Image src={license} alt="Патенты на полезную модель и изобретение, свидетельства на товарный знак и программы для ЭВМ"
+          widths={[480, 720, 1000, 1400]} sizes="(min-width: 1024px) 680px, calc(100vw - 32px)"
+          class="h-auto w-full" loading="lazy" decoding="async" />
+      </div>
+    </div>
+
+    <!-- 03 · Команда -->
+    <div class="block-grid sub-block">
+      <div>
+        <p class="idx" aria-hidden="true">03</p>
+        <h3 class="sub-title mt-3 font-bold">Команда</h3>
+      </div>
+      <ul class="grid grid-cols-2 gap-x-3 gap-y-7 md:grid-cols-3 md:gap-x-5 md:gap-y-9">
+        {team.map((m) => (
+          <li class="group min-w-0">
+            <div class="aspect-square overflow-hidden bg-bg2">
+              {/* alt="" намеренно: имя и роль — соседний текст, иначе скринридер прочтёт имя дважды */}
+              <Image src={m.img} alt="" widths={[180, 360]} sizes="(min-width: 1024px) 220px, (min-width: 768px) 30vw, 46vw"
+                class="size-full object-cover grayscale mix-blend-luminosity transition duration-300 group-hover:grayscale-0 group-hover:mix-blend-normal"
+                loading="lazy" decoding="async" />
+            </div>
+            <p class="mt-3 text-[15px] leading-snug font-bold md:text-base">{m.name}</p>
+            <p class="mt-1 text-[13px] leading-snug text-pretty text-mut md:text-sm">{m.role}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+
+    <!-- 04 · Роадмап -->
+    <div class="sub-block">
+      <p class="idx" aria-hidden="true">04</p>
+      <h3 class="sub-title mt-3 font-bold">Роадмап</h3>
+      <ol class="rm mt-8 lg:mt-10">
+        {roadmap.map((r) => (
+          <li data-future={r.year >= NOW ? '' : undefined} data-now={r.year === NOW ? '' : undefined} aria-current={r.year === NOW ? 'step' : undefined}>
+            <span class="dot" aria-hidden="true"></span>
+            <p class="flex items-baseline gap-3">
+              <b class="font-display text-[20px] leading-none font-bold">{r.year}</b>
+              {r.year === NOW && <span class="tag">сейчас</span>}
+            </p>
+            <p class="mt-2 max-w-[340px] text-[15px] leading-snug text-pretty text-mut">{r.text}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </div>
+</section>
+<style>
+  /* «ПРОВЕРЕНО НА СКЛАДЕ» ≈ 13,6 em: на 360–390 две-три строки, на десктопе одна-две */
+  .trust-title { font-size: clamp(24px, calc((100vw - 32px) / 13), 44px); }
+  .sub-title { font-size: clamp(19px, 5.4vw, 26px); }
+  .idx { font-family: var(--font-mono); font-size: 11px; letter-spacing: .08em; color: var(--color-mut); }
+  .sub-block { margin-top: 56px; padding-top: 40px; border-top: 1px solid var(--color-line); }
+
+  .block-grid { display: grid; grid-template-columns: minmax(0, 1fr); row-gap: 28px; }
+  @media (width >= 768px) {
+    .sub-block { margin-top: 72px; padding-top: 56px; }
+  }
+  @media (width >= 1024px) {
+    .block-grid { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); column-gap: 56px; align-items: start; }
+  }
+
+  /* Роадмап: на мобильном вертикальная линия, с lg — горизонтальная. Метки квадратные, как на потолке.
+     Сплошная линия — пройденное, пунктир — план. */
+  .rm { display: grid; }
+  .rm li { position: relative; padding: 0 0 28px 30px; }
+  .rm li::before {
+    content: ""; position: absolute; left: 5px; top: 8px; bottom: -8px; width: 2px;
+    background: var(--color-mut);
+  }
+  .rm li[data-future]::before { background: repeating-linear-gradient(to bottom, var(--color-mut) 0 4px, transparent 4px 10px); opacity: .6; }
+  .rm li:last-child { padding-bottom: 0; }
+  .rm li:last-child::before { display: none; }
+  .dot { position: absolute; left: 0; top: 3px; width: 12px; height: 12px; background: var(--color-mut); }
+  .rm li[data-future] .dot { background: var(--color-bg); outline: 2px solid var(--color-line); outline-offset: -2px; }
+  .rm li[data-now] .dot { background: var(--color-acc); outline: 0; }
+  .rm li[data-now] .dot::after {
+    content: ""; position: absolute; inset: 0; opacity: 0;
+    outline: 2px solid var(--color-acc); animation: rm-ping 2.4s cubic-bezier(0, 0, .2, 1) infinite;
+  }
+  @keyframes rm-ping { 0% { opacity: .8; transform: scale(1); } 80%, 100% { opacity: 0; transform: scale(2.6); } }
+  @media (width >= 1024px) {
+    .rm { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+    .rm li { padding: 32px 20px 0 0; }
+    .rm li::before { left: 0; right: 0; top: 5px; bottom: auto; width: auto; height: 2px; }
+    .rm li[data-future]::before { background: repeating-linear-gradient(to right, var(--color-mut) 0 4px, transparent 4px 10px); }
+    .rm li:last-child::before { display: block; }
+    .dot { top: 0; }
+  }
+</style>
