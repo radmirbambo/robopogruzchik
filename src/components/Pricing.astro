@@ -1,0 +1,79 @@
+---
+// Три публичных тарифа — единственные цены на сайте. Суммы из PRICES, как и в калькуляторе.
+// Пробелы: U+00A0 держит «+» и предлоги с соседним словом, U+202F внутри сумм ставит rub().
+import { PRICES, type TariffId } from '../lib/calc';
+import { rub } from '../lib/format';
+import { SITE } from '../config';
+
+interface Card { id: TariffId; title: string; price: string; per?: string; extra?: string; text: string; cta: string; note?: string }
+const cards: Card[] = [
+  {
+    id: 'turnkey', title: 'Покупка под ключ', price: rub(PRICES.turnkey),
+    text: 'Готовый робот: тележка + ПАК + ПО. Окупается примерно за год при двух сменах и за 4–7 месяцев при работе 24/7.',
+    cta: 'Обсудить покупку',
+  },
+  {
+    id: 'pak', title: 'Только ПАК', price: rub(PRICES.pakCapex), extra: `+ ${rub(PRICES.pakMonthly)}/мес`,
+    text: 'Ставим комплекс на вашу тележку. Подписка — поддержка и обновления ПО.',
+    cta: 'Обсудить ПАК',
+  },
+  {
+    id: 'subscription', title: 'Всё в подписку', price: rub(PRICES.subMonthly), per: '/мес',
+    text: 'Без капзатрат. Дешевле двух смен водителей.',
+    cta: 'Обсудить подписку', note: '// без капзатрат',
+  },
+];
+const vat = SITE.pricesIncludeVat === null ? null : SITE.pricesIncludeVat ? 'Цены указаны с НДС' : 'Цены указаны без НДС';
+---
+<section id="pricing" class="border-t border-line py-20 md:py-28" aria-labelledby="pricing-title">
+  <div class="container-x">
+    <p class="tag">// Тарифы</p>
+    <h2 id="pricing-title" class="pricing-title mt-4 font-bold md:mt-5">Три способа начать</h2>
+
+    <!-- Три колонки только с lg: на планшете в колонке 185 px кнопки и названия ломаются в две строки -->
+    <ul class="mt-10 grid gap-5 md:mt-14 lg:grid-cols-3">
+      {cards.map((c) => (
+        <li class:list={['relative flex flex-col border bg-bg2 px-5 pt-6 pb-5 md:px-7 md:pt-8 md:pb-7 lg:row-span-4 lg:grid lg:grid-rows-subgrid lg:gap-0', c.note ? 'border-acc' : 'border-line']}>
+          {c.note && <p class="tag absolute -top-[9px] left-4 bg-bg px-1.5 leading-[18px] md:left-6">{c.note}</p>}
+          <h3 class="text-[15px] font-bold lg:text-base">{c.title}</h3>
+          <div class="price-box mt-5 md:mt-6">
+            <p class="price font-display leading-none font-bold whitespace-nowrap tabular-nums">
+              {c.price}{c.per && <span class="price-per">{c.per}</span>}
+            </p>
+            {c.extra && <p class="mt-3 font-mono text-[15px] whitespace-nowrap">{c.extra}</p>}
+          </div>
+          <p class="mt-5 max-w-[520px] text-[15px] leading-relaxed text-pretty text-mut md:mt-6">{c.text}</p>
+          <!-- sm..lg: кнопка по тексту; в сетке lg align-self влияет только на вертикаль, ширина — на всю карточку -->
+          <a href="#lead" data-tariff={c.id}
+            class:list={['group mt-6 inline-flex min-h-12 items-center justify-center gap-2.5 px-5 text-[15px] font-bold transition-colors sm:self-start md:mt-8',
+              c.note ? 'bg-acc text-black hover:bg-fg' : 'border border-line text-fg hover:border-mut']}>
+            {c.cta} <span aria-hidden="true" class="transition-transform group-hover:translate-x-1">→</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+
+    {vat && <p class="mt-5 font-mono text-[11px] tracking-[.06em] text-mut uppercase">{vat}</p>}
+  </div>
+</section>
+<script>
+  import { emitLeadPrefill, onLeadPrefill, type LeadPrefill } from '../lib/bus';
+  import type { TariffId } from '../lib/calc';
+
+  // Если в форму уже ушёл расчёт калькулятора, выбор тарифа меняет только тариф, а не число машин и режим
+  let last: LeadPrefill = { units: 1, mode: 'two', calc: '' };
+  onLeadPrefill((d) => { last = d; });
+  // Прокрутку к форме делает сама ссылка href="#lead"
+  document.querySelectorAll<HTMLAnchorElement>('#pricing [data-tariff]').forEach((a) => a.addEventListener('click', () => {
+    emitLeadPrefill({ ...last, tariff: a.dataset.tariff as TariffId });
+  }));
+</script>
+<style>
+  .pricing-title { font-size: clamp(26px, calc((100vw - 32px) / 12), 44px); }
+
+  /* Сумма тянется по ширине карточки: «2 500 000 ₽» ≈ 6,6 em в Unbounded 700.
+     Контейнер — обёртка цены, не сама карточка: containment на карточке выключает subgrid. */
+  .price-box { container-type: inline-size; }
+  .price { font-size: clamp(24px, 12cqi, 40px); }
+  .price-per { font-size: .45em; margin-left: .2em; letter-spacing: 0; }
+</style>
