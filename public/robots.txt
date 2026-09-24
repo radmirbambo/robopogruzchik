@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://radmirbambo.github.io/robopogruzchik/sitemap-index.xml

@@ -11,7 +11,7 @@ export const SITE = {
     status: 'ИП / самозанятый',
     inn: '000000000000',
   },
-  metrikaId: 0,            // P3; 0 = Метрика выключена
+  metrikaId: 113025435,    // P3; 0 = Метрика выключена
   webmasterVerification: '', // P3
   form: {
     // Заполняется скриптом integrations/yandex-form/create-form.mjs

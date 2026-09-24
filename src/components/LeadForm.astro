@@ -53,7 +53,7 @@ const { id, baseUrl } = SITE.form;
     )}
   </div>
 </section>
-{baseUrl && <script is:inline src="https://forms.yandex.ru/_static/embed.js" defer></script>}
+<!-- embed.js (подгонка высоты iframe) scripts/leadform.ts подключает вместе с формой, не при загрузке страницы -->
 <script>import '../scripts/leadform.ts';</script>
 <style>
   /* Две строки на 360–390 (самая длинная «ПОД ВАШ СКЛАД» = 11,3 em), одна на десктопе (20,7 em) */
