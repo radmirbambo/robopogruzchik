@@ -1,0 +1,71 @@
+---
+import HeroGrid from './HeroGrid.astro';
+
+const kpis = [
+  { value: '1,5–3 т', label: 'грузоподъёмность' },
+  { value: '24/7', label: 'без смен и больничных' },
+  { value: 'МФТИ', label: 'исключительная лицензия' },
+];
+---
+<section class="relative" aria-labelledby="hero-title">
+  <div class="hero-layout container-x pt-10 pb-10 md:pt-16 md:pb-14 lg:pt-20 lg:pb-16">
+    <div class="hero-copy">
+      <p class="tag">// Роботизация склада без остановки</p>
+      <h1 id="hero-title" class="hero-title mt-4 font-bold md:mt-5">Водитель стоит<br><em class="not-italic text-acc">от&nbsp;200&#8239;000&#8239;₽</em><br>в&nbsp;месяц. Робот&nbsp;—&nbsp;нет.</h1>
+      <p class="mt-5 max-w-[440px] text-base leading-relaxed text-pretty text-mut md:mt-6 md:text-[17px]">Ставим ПАК на&nbsp;вашу электротележку, и&nbsp;она сама возит паллеты по&nbsp;потолочным меткам. Без лидара, без новой разметки, без остановки склада.</p>
+      <div class="mt-7 flex flex-col gap-3 sm:flex-row md:mt-8">
+        <a href="#calc" data-goal="hero_cta" class="cta group inline-flex min-h-13 items-center justify-center gap-2.5 bg-acc px-6 text-[15px] font-bold text-black transition-colors hover:bg-fg">
+          Рассчитать окупаемость <span aria-hidden="true" class="transition-transform group-hover:translate-x-1">→</span>
+        </a>
+        <a href="#how" class="inline-flex min-h-13 items-center justify-center border border-line px-6 text-[15px] font-medium text-fg transition-colors hover:border-mut">Как это работает</a>
+      </div>
+    </div>
+
+    <div class="hero-art">
+      <HeroGrid class="mx-auto max-w-[360px] opacity-90 lg:max-w-[460px] lg:opacity-100" />
+    </div>
+
+    <ul class="hero-kpi grid grid-cols-3 border-t border-line">
+      {kpis.map((k) => (
+        <li class="min-w-0 pt-4 pr-2 not-first:border-l not-first:border-line not-first:pl-3 md:pt-5 md:pr-4 md:not-first:pl-5">
+          <b class="block font-display text-[22px] leading-none font-bold whitespace-nowrap">{k.value}</b>
+          <span class="mt-2 block font-mono text-[10px] leading-snug tracking-[.06em] text-mut uppercase hyphens-auto">{k.label}</span>
+        </li>
+      ))}
+    </ul>
+  </div>
+  <div class="hazard h-2.5" aria-hidden="true"></div>
+</section>
+<style>
+  .hero-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "copy" "art" "kpi";
+    row-gap: 36px;
+  }
+  .hero-copy { grid-area: copy; }
+  .hero-art { grid-area: art; }
+  .hero-kpi { grid-area: kpi; }
+
+  /* Размер h1 от ширины колонки: самая длинная строка «ВОДИТЕЛЬ СТОИТ» = 11,86 em в Unbounded 700.
+     Делитель 12,4 оставляет ~4 % запаса, чтобы строка не рвалась на 360–390 px и на планшете. */
+  .hero-title { font-size: min(64px, calc((100vw - 32px) / 12.4)); }
+  @media (width >= 768px) {
+    .hero-title { font-size: min(64px, calc((100vw - 64px) / 12.4)); }
+  }
+  @media (width >= 1024px) {
+    .hero-layout {
+      grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr);
+      grid-template-areas: "copy art" "kpi art";
+      grid-template-rows: auto 1fr;
+      column-gap: 48px;
+      row-gap: 48px;
+      align-items: end;
+    }
+    .hero-copy { align-self: start; }
+    .hero-art { align-self: center; }
+    .hero-kpi { max-width: 560px; }
+    /* Две колонки: текст ≈ 540–645 px, 11,86 em × 52 px = 617 px */
+    .hero-title { font-size: clamp(40px, 4.2vw, 52px); }
+  }
+</style>

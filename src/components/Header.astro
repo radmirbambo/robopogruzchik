@@ -1,0 +1,36 @@
+---
+const base = import.meta.env.BASE_URL;
+const links = [
+  { href: '#how', label: 'Как работает' },
+  { href: '#calc', label: 'Калькулятор' },
+  { href: '#pricing', label: 'Тарифы' },
+  { href: '#faq', label: 'FAQ' },
+];
+---
+<header class="sticky top-0 z-50 border-b border-line bg-bg/85 backdrop-blur">
+  <div class="container-x flex h-14 items-center justify-between gap-4 md:h-16">
+    <a href={base} class="-my-1 flex min-h-11 items-center gap-2.5 py-1" aria-label="Беспилотный погрузчик — на главную">
+      <span class="logo-mark hazard inline-block size-[22px] shrink-0 lg:size-[18px]" aria-hidden="true"></span>
+      <!-- До lg вордмарк в две строки: одной строкой в Unbounded он шире экрана 360–390 px вместе с кнопкой -->
+      <span class="font-display text-[11px] leading-[1.08] font-extrabold tracking-wide lg:text-[13px] lg:leading-none" aria-hidden="true">
+        <span class="block lg:inline">БЕСПИЛОТНЫЙ</span> <span class="block lg:inline">ПОГРУЗЧИК</span>
+      </span>
+    </a>
+    <nav aria-label="Разделы" class="flex items-center gap-2 lg:gap-4">
+      <ul class="hidden items-center md:flex">
+        {links.map((l) => (
+          <li><a href={l.href} class="flex min-h-11 items-center px-3 text-sm text-mut transition-colors hover:text-fg">{l.label}</a></li>
+        ))}
+      </ul>
+      <a href="#calc" class="inline-flex min-h-11 items-center bg-acc px-4 py-2.5 text-sm font-bold text-black transition-colors hover:bg-fg">Рассчитать</a>
+    </nav>
+  </div>
+</header>
+<style is:global>
+  /* Якоря (#calc, #how …) не должны уезжать под липкую шапку */
+  html { scroll-padding-top: 4.5rem; }
+</style>
+<style>
+  /* Мелкий шаг полосы, как в утверждённом мокапе A: утилита hazard (14/28 px) на 18–22 px читается как один диагональный клин */
+  .logo-mark { background: repeating-linear-gradient(-45deg, var(--color-acc) 0 4px, #111 4px 8px); }
+</style>

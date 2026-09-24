@@ -1,0 +1,109 @@
+---
+// Вид сверху: сетка потолочных меток (шаг 6 м), маршрут и робот.
+// Робот едет по offset-path; метки на маршруте «считываются» (вспышка + рамка захвата)
+// ровно в момент, когда робот под ними проезжает. Все анимации — один цикл 9 с,
+// поэтому они синхронны без JS.
+interface Props { class?: string }
+const { class: cls = '' } = Astro.props;
+
+const DUR = 9; // с, длительность цикла
+const pts = [[60, 310], [180, 310], [180, 110], [300, 110], [300, 210], [420, 210], [420, 60]];
+const path = 'M' + pts.map(([x, y]) => `${x} ${y}`).join(' L');
+
+// Длина маршрута и позиция (0…1) точки на нём, если она лежит на отрезке
+const segs = pts.slice(1).map(([x, y], i) => ({ a: pts[i], b: [x, y], len: Math.abs(x - pts[i][0]) + Math.abs(y - pts[i][1]) }));
+const total = segs.reduce((s, g) => s + g.len, 0);
+const posOnRoute = (cx: number, cy: number): number | null => {
+  let acc = 0;
+  for (const { a, b, len } of segs) {
+    const inX = cx >= Math.min(a[0], b[0]) && cx <= Math.max(a[0], b[0]);
+    const inY = cy >= Math.min(a[1], b[1]) && cy <= Math.max(a[1], b[1]);
+    if (inX && inY) return (acc + Math.abs(cx - a[0]) + Math.abs(cy - a[1])) / total;
+    acc += len;
+  }
+  return null;
+};
+
+// Статичный кадр (prefers-reduced-motion): робот стоит под меткой M-0712
+const STILL = posOnRoute(180, 160)!;
+
+const marks = [60, 160, 260].flatMap((cy) => [60, 180, 300, 420].map((cx) => {
+  const p = posOnRoute(cx, cy);
+  return { cx, cy, p, seen: p !== null && p <= STILL };
+}));
+const onRoute = marks.filter((m) => m.p !== null);
+const delay = (p: number, lead = 0.12) => `${Math.max(0, p * DUR - lead).toFixed(2)}s`;
+const reticle = (cx: number, cy: number, r = 20, c = 7) =>
+  [[-1, -1], [1, -1], [1, 1], [-1, 1]]
+    .map(([sx, sy]) => `M${cx + sx * r} ${cy + sy * (r - c)}V${cy + sy * r}H${cx + sx * (r - c)}`)
+    .join('');
+---
+<svg class:list={['hero-grid', cls]} viewBox="0 0 460 380" fill="none" aria-hidden="true" focusable="false"
+  style={`--dur:${DUR}s;--len:${total};--still:${(STILL * 100).toFixed(2)}%;--still-off:${(total * (1 - STILL)).toFixed(1)}`}>
+  <defs>
+    <!-- Линии сетки уходят в фон к краям: потолок «бесконечный», а не нарисованная рамка -->
+    <linearGradient id="hg-fx"><stop offset="0" stop-color="#000" /><stop offset=".14" stop-color="#fff" /><stop offset=".86" stop-color="#fff" /><stop offset="1" stop-color="#000" /></linearGradient>
+    <linearGradient id="hg-fy" x2="0" y2="1"><stop offset="0" stop-color="#000" /><stop offset=".14" stop-color="#fff" /><stop offset=".86" stop-color="#fff" /><stop offset="1" stop-color="#000" /></linearGradient>
+    <mask id="hg-mx"><rect width="460" height="380" fill="url(#hg-fx)" /></mask>
+    <mask id="hg-my"><rect width="460" height="380" fill="url(#hg-fy)" /></mask>
+  </defs>
+  <g mask="url(#hg-mx)"><g mask="url(#hg-my)" stroke="#2A2E34"><path d="M0 60H460M0 160H460M0 260H460M0 360H460M60 0V380M180 0V380M300 0V380M420 0V380" /></g></g>
+  <g fill="#F2F0EA">
+    {marks.map((m) => (
+      <rect x={m.cx - 8} y={m.cy - 8} width="16" height="16"
+        class:list={['mk', { rd: m.p !== null, seen: m.seen }]}
+        style={m.p !== null ? `animation-delay:${delay(m.p)}` : undefined} />
+    ))}
+  </g>
+  <path d={path} stroke="#FFC629" stroke-width="2" stroke-dasharray="6 6" opacity=".7" />
+  <path class="trail" d={path} stroke="#FFC629" stroke-width="2" />
+  <g class="bot" style={`offset-path: path('${path}')`}>
+    <rect x="-16" y="-11" width="32" height="22" fill="#FFC629" /><rect x="16" y="-8" width="16" height="4" fill="#FFC629" /><rect x="16" y="4" width="16" height="4" fill="#FFC629" /><circle cx="-6" cy="0" r="4" fill="#111" />
+  </g>
+  <g stroke="#FFC629" stroke-width="1.5">
+    {onRoute.map((m) => (
+      <path class:list={['lock', { now: m.p === STILL }]} d={reticle(m.cx, m.cy)} style={`animation-delay:${delay(m.p!, 0.2)}`} />
+    ))}
+  </g>
+  <g font-family="JetBrains Mono, monospace" font-size="10" fill="#8C9098">
+    <text x="206" y="153">M-0712</text><text x="326" y="153">M-0934</text><text x="20" y="340">шаг 6 м · метка 50×50 см</text>
+  </g>
+</svg>
+<style>
+  .hero-grid { display: block; width: 100%; height: auto; }
+
+  /* Базовые значения = статичный кадр для prefers-reduced-motion (глобальный CSS гасит все animation) */
+  .mk { opacity: .45; }
+  .mk.seen { fill: #FFC629; opacity: 1; }
+  .trail { stroke-dasharray: var(--len); stroke-dashoffset: var(--still-off); opacity: .9; }
+  .bot { offset-rotate: auto; offset-distance: var(--still); }
+  .lock { opacity: 0; transform-box: fill-box; transform-origin: center; }
+  .lock.now { opacity: 1; }
+
+  .bot { animation: hg-drive var(--dur) linear infinite; }
+  .trail { animation: hg-trail var(--dur) linear infinite; }
+  .mk.rd { animation: hg-read var(--dur) linear infinite backwards; }
+  .lock { animation: hg-lock var(--dur) linear infinite backwards; }
+
+  @keyframes hg-drive {
+    0% { offset-distance: 0%; opacity: 0; }
+    4%, 94% { opacity: 1; }
+    100% { offset-distance: 100%; opacity: 0; }
+  }
+  @keyframes hg-trail {
+    0% { stroke-dashoffset: var(--len); opacity: .9; }
+    94% { opacity: .9; }
+    100% { stroke-dashoffset: 0; opacity: 0; }
+  }
+  @keyframes hg-read {
+    0% { fill: #F2F0EA; opacity: .45; }
+    3%, 14% { fill: #FFC629; opacity: 1; }
+    32%, 100% { fill: #F2F0EA; opacity: .45; }
+  }
+  @keyframes hg-lock {
+    0% { opacity: 0; transform: scale(1.6); }
+    3% { opacity: 1; transform: scale(1); }
+    9% { opacity: 1; transform: scale(1); }
+    13%, 100% { opacity: 0; transform: scale(1); }
+  }
+</style>

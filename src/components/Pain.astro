@@ -1,0 +1,36 @@
+---
+// Три «строки счёта»: цифры растут сверху вниз. Число и подпись в одной строке на ≥ lg,
+// друг под другом на мобильном. Пробелы: U+00A0 после «от», U+202F — между разрядами и единицами.
+const items = [
+  { value: '30–70%', text: 'операций на складе составляет перевозка паллет по полу' },
+  { value: 'от 200 тыс. ₽', text: 'в месяц обходится один погрузчик в две смены только на зарплатах водителей' },
+  { value: '300–600 тыс. ₽', text: 'в месяц стоит круглосуточный пост. Сверху найм, текучка, больничные и человеческий фактор' },
+];
+---
+<section id="pain" class="py-20 md:py-28" aria-labelledby="pain-title">
+  <div class="container-x">
+    <h2 id="pain-title" class="pain-title font-bold">Паллеты возят люди.<br>Люди стоят дорого</h2>
+    <ul class="mt-10 border-b border-line md:mt-14">
+      {items.map((it) => (
+        <li class="grid gap-3 border-t border-line py-7 md:py-9 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)] lg:items-center lg:gap-12">
+          <p class="pain-num font-display leading-none font-bold whitespace-nowrap text-acc">{it.value}</p>
+          <p class="max-w-[460px] text-base leading-relaxed text-pretty text-mut md:text-[17px]">{it.text}</p>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+<style>
+  /* Две строки на любой ширине: «ПАЛЛЕТЫ ВОЗЯТ ЛЮДИ.» = 15,92 em в Unbounded 700 */
+  .pain-title { font-size: min(48px, calc((100vw - 32px) / 16.6)); }
+  /* Самое длинное число «300–600 ТЫС. ₽» ≈ 10,1 em */
+  .pain-num { font-size: min(60px, calc((100vw - 32px) / 10.8)); }
+  @media (width >= 768px) {
+    .pain-title { font-size: min(48px, calc((100vw - 64px) / 16.6)); }
+    .pain-num { font-size: min(60px, calc((100vw - 64px) / 10.8)); }
+  }
+  @media (width >= 1024px) {
+    /* Колонка числа ≈ 525–630 px */
+    .pain-num { font-size: clamp(46px, 4.6vw, 56px); }
+  }
+</style>
