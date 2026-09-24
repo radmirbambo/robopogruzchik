@@ -7,7 +7,7 @@ export function seoJsonLd(url: string, logo: string, image: string): object[] {
   const org = { '@type': 'Organization', name: 'Беспилотный погрузчик', alternateName: 'Russian FMR', url, logo };
   const offer = (name: string, price: number, unit?: string) => ({
     '@type': 'Offer', name, priceCurrency: 'RUB', price, availability: 'https://schema.org/InStock', url: url + '#pricing',
-    ...(unit ? { priceSpecification: { '@type': 'UnitPriceSpecification', price, priceCurrency: 'RUB', unitText: unit } } : {}),
+    ...(unit ? { priceSpecification: { '@type': 'UnitPriceSpecification', price, priceCurrency: 'RUB', unitCode: unit } } : {}),
   });
   return [
     { '@context': 'https://schema.org', ...org },

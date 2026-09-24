@@ -21,7 +21,7 @@ describe('seoJsonLd', () => {
       ['Всё в подписку', PRICES.subMonthly],
     ]);
     for (const o of offers) expect(o.priceCurrency).toBe('RUB');
-    expect(offers[2].priceSpecification).toMatchObject({ '@type': 'UnitPriceSpecification', price: PRICES.subMonthly, unitText: 'MON' });
+    expect(offers[2].priceSpecification).toMatchObject({ '@type': 'UnitPriceSpecification', price: PRICES.subMonthly, unitCode: 'MON' });
   });
 
   it('других цен в разметке нет', () => {
