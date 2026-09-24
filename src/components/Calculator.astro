@@ -1,0 +1,230 @@
+---
+// Калькулятор окупаемости. Сервер рендерит расчёт по умолчанию (страница осмысленна без JS),
+// остров scripts/calculator.ts пересчитывает его при любом изменении формы.
+import { calculate, normalizeInput, LIMITS, MODES, REGIONS, type RegionId } from '../lib/calc';
+import { mln, rub } from '../lib/format';
+import { announcement, barWidths, tariffView, TARIFF_LABELS, TARIFF_SHORT } from '../lib/calc-view';
+
+// R7: значения по умолчанию = проверочный кейс 3 спецификации (1 092 000 ₽/мес; покупка 9,2 мес)
+const REGION: RegionId = 'msk';
+const input = normalizeInput({ units: 4, mode: 'two', salary: REGIONS[REGION].salary, withTaxes: true });
+const r = calculate(input);
+const bars = barWidths(r);
+const [U_MIN, U_MAX] = LIMITS.units;
+const [S_MIN, S_MAX] = LIMITS.salary;
+const salaryPct = ((input.salary - S_MIN) / (S_MAX - S_MIN)) * 100;
+
+// «2 смены · 5/2 по 8 ч» → крупно «2 смены», мелко «5/2 по 8 ч»
+const modes = Object.entries(MODES).map(([id, m]) => {
+  const [main, detail] = m.label.split(' · ');
+  return { id, main, detail };
+});
+const regions = Object.entries(REGIONS);
+const tariffs = r.tariffs.map((t) => ({ id: t.id, cost3y: t.cost3y, view: tariffView(t) }));
+const fields = [
+  { key: 'capex', label: 'Вложения' },
+  { key: 'monthly', label: 'Платёж' },
+  { key: 'payback', label: 'Окупаемость' },
+  { key: 'saving3y', label: 'Экономия за 3 года' },
+] as const;
+---
+<section id="calc" class="border-t border-line py-20 md:py-28" aria-labelledby="calc-title">
+  <div class="container-x">
+    <p class="tag">// Калькулятор окупаемости</p>
+    <h2 id="calc-title" class="calc-title mt-4 max-w-[980px] font-bold text-balance md:mt-5">Сколько вы тратите на водителей&nbsp;— и&nbsp;сколько сэкономит робот</h2>
+
+    <div class="calc-grid mt-10 md:mt-14">
+      <form class="calc-form border border-line bg-bg2 px-4 md:px-6" aria-label="Параметры расчёта" autocomplete="off" novalidate>
+        <div class="flex items-center justify-between gap-4 border-b border-dashed border-line py-4">
+          <label for="calc-units" class="text-[15px]">Погрузчиков</label>
+          <div class="flex">
+            <button type="button" data-step="-1" aria-controls="calc-units" aria-label="Меньше погрузчиков" class="step">−</button>
+            <input id="calc-units" name="units" type="number" inputmode="numeric" min={U_MIN} max={U_MAX} step="1" value={input.units}
+              class="units h-11 w-16 border-y border-line bg-bg text-center font-mono text-[17px] text-acc" />
+            <button type="button" data-step="1" aria-controls="calc-units" aria-label="Больше погрузчиков" class="step">+</button>
+          </div>
+        </div>
+
+        <div class="border-b border-dashed border-line py-4">
+          <fieldset>
+            <legend class="text-[15px]">Режим работы</legend>
+            <div class="mt-3 grid grid-cols-3 gap-1.5">
+              {modes.map((m) => (
+                <label class="cursor-pointer">
+                  <input type="radio" name="mode" value={m.id} checked={m.id === input.mode} class="peer sr-only" />
+                  <span class="flex min-h-14 flex-col justify-center border border-line px-1.5 py-2 text-center transition-colors peer-checked:border-acc peer-checked:bg-acc peer-checked:text-black peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-acc hover:border-mut">
+                    <span class="text-[14px] leading-tight font-bold">{m.main}</span>
+                    <span class="mt-1 font-mono text-[10px] leading-tight opacity-75">{m.detail}</span>
+                  </span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
+        </div>
+
+        <div class="flex items-center justify-between gap-4 border-b border-dashed border-line py-4">
+          <label for="calc-region" class="text-[15px]">Регион</label>
+          <div class="relative w-[min(230px,64%)]">
+            <select id="calc-region" name="region" class="min-h-11 w-full cursor-pointer appearance-none border border-line bg-bg py-2 pr-9 pl-3 text-[15px] text-fg">
+              {regions.map(([id, reg]) => <option value={id} selected={id === REGION}>{reg.label}</option>)}
+            </select>
+            <svg class="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-acc" width="12" height="8" viewBox="0 0 12 8" aria-hidden="true"><path d="M1 1.5l5 5 5-5" stroke="currentColor" stroke-width="2" fill="none" /></svg>
+          </div>
+        </div>
+
+        <div class="border-b border-dashed border-line pt-4 pb-3">
+          <div class="flex items-baseline justify-between gap-4">
+            <label for="calc-salary" class="text-[15px]">ЗП водителя</label>
+            <output for="calc-salary" data-out="salary" class="font-mono text-[15px] whitespace-nowrap text-acc">{rub(input.salary)}</output>
+          </div>
+          <input id="calc-salary" name="salary" type="range" min={S_MIN} max={S_MAX} step="1000" value={input.salary}
+            aria-describedby="calc-salary-hint" aria-valuetext={`${rub(input.salary)} в месяц`}
+            class="range mt-1 block w-full" style={`--p:${salaryPct}%`} />
+          <p id="calc-salary-hint" class="font-mono text-[10px] tracking-[.06em] text-mut uppercase">медиана вакансий по региону, 2026</p>
+        </div>
+
+        <div class="py-3">
+          <label class="flex min-h-11 cursor-pointer items-center gap-3">
+            <input type="checkbox" name="withTaxes" checked aria-describedby="calc-taxes-hint" class="check shrink-0" />
+            <span class="text-[15px]">Учитывать страховые взносы +30%</span>
+          </label>
+          <p id="calc-taxes-hint" class="pl-[34px] text-[13px] leading-snug text-mut">реальная стоимость сотрудника для компании</p>
+        </div>
+      </form>
+
+      <div class="calc-now bg-acc p-4 text-black md:p-6">
+        <p class="font-mono text-[11px] tracking-[.08em] uppercase">сейчас на водителях</p>
+        <p class="calc-big mt-2 font-display leading-none font-bold whitespace-nowrap tabular-nums">
+          <span data-out="current" data-v={r.currentMonthly}>{rub(r.currentMonthly)}</span><span class="calc-per">/мес</span>
+        </p>
+        <p class="mt-3 font-mono text-[12px] tracking-[.06em] uppercase">за 3 года: <b data-out="current3y" data-v={r.current3y} class="font-bold">{mln(r.current3y)}</b></p>
+      </div>
+
+      <div class="calc-res">
+        <p class="sr-only" aria-live="polite" aria-atomic="true" data-out="summary">{announcement(r)}</p>
+
+        <ul class="grid gap-5 pt-3 md:grid-cols-3 md:grid-rows-[auto_auto] md:gap-x-3 md:gap-y-0">
+          {tariffs.map((t) => (
+            <li data-tariff={t.id} data-is-best={r.best === t.id ? '' : undefined}
+              class="relative flex flex-col border border-line bg-bg px-4 pt-5 pb-4 transition-colors data-[is-best]:border-acc md:row-span-2 md:grid md:grid-rows-subgrid">
+              <p data-best hidden={r.best !== t.id}
+                class="absolute -top-[11px] left-3 bg-acc px-2 font-mono text-[10px] leading-[22px] font-bold tracking-[.08em] text-black uppercase">Выгоднее всего</p>
+              <h3 class="text-[13px] font-bold">{TARIFF_LABELS[t.id]}</h3>
+              <dl class="mt-3 grid md:mt-4 md:content-start md:gap-3">
+                {fields.map((f) => (
+                  <div class="flex items-baseline justify-between gap-3 border-t border-line/70 py-2 md:block md:border-0 md:py-0">
+                    <dt class="shrink-0 font-mono text-[10px] tracking-[.06em] text-mut uppercase">{f.label}</dt>
+                    <dd data-f={f.key}
+                      class:list={[
+                        'text-right font-mono md:mt-1 md:text-left',
+                        f.key === 'saving3y' ? 'text-[15px] font-bold' : 'text-[14px]',
+                        f.key === 'saving3y' && t.view.loss && 'text-alarm',
+                      ]}>{t.view[f.key]}</dd>
+                  </div>
+                ))}
+              </dl>
+            </li>
+          ))}
+        </ul>
+
+        <div class="mt-6 border border-line p-4 md:p-5">
+          <p id="calc-bars-title" class="font-mono text-[11px] tracking-[.08em] text-mut uppercase">Расходы за 3 года</p>
+          <ul class="mt-4 grid gap-3 font-mono text-[12px]" aria-labelledby="calc-bars-title">
+            <li class="bar-row">
+              <span>Водители</span>
+              <span class="h-2.5 bg-line" aria-hidden="true"><span data-bar="drivers" class="bar bg-alarm" style={`width:${bars.drivers}%`}></span></span>
+              <span data-barv="drivers" class="text-right whitespace-nowrap">{mln(r.current3y)}</span>
+            </li>
+            {tariffs.map((t) => (
+              <li class="bar-row">
+                <span>{TARIFF_SHORT[t.id]}</span>
+                <span class="h-2.5 bg-line" aria-hidden="true"><span data-bar={t.id} class="bar bg-acc" style={`width:${bars[t.id]}%`}></span></span>
+                <span data-barv={t.id} class="text-right whitespace-nowrap">{mln(t.cost3y)}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <p class="mt-5 text-xs leading-relaxed text-pretty text-mut">Сравнение при тех же часах работы. Электроэнергия и ТО тележки не учитываются — они есть и сейчас. Робот может работать и сверх ваших смен. Зарплаты — медианы вакансий «водитель погрузчика» (trudvsem.ru, 2026).</p>
+
+        <a href="#lead" data-action="calc-cta"
+          class="group mt-6 inline-flex min-h-13 w-full items-center justify-center gap-2.5 bg-acc px-6 text-[15px] font-bold text-black transition-colors hover:bg-fg sm:w-auto">
+          Получить КП с этим расчётом <span aria-hidden="true" class="transition-transform group-hover:translate-x-1">→</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+<script>import '../scripts/calculator.ts';</script>
+<style>
+  /* Самое длинное слово «СЭКОНОМИТ» ≈ 7,6 em; на 360–390 заголовок в 5 строк, на десктопе в 3 */
+  .calc-title { font-size: clamp(22px, calc((100vw - 32px) / 15), 44px); }
+
+  .calc-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "form" "now" "res";
+  }
+  .calc-form { grid-area: form; color-scheme: dark; }
+  .calc-now { grid-area: now; container-type: inline-size; }
+  .calc-res { grid-area: res; margin-top: 40px; }
+  @media (width >= 1024px) {
+    .calc-grid {
+      grid-template-columns: minmax(0, 400px) minmax(0, 1fr);
+      grid-template-rows: auto 1fr;
+      grid-template-areas: "form res" "now res";
+      column-gap: 40px;
+      align-items: start;
+    }
+    .calc-res { margin-top: 0; }
+  }
+  @media (width >= 1280px) {
+    .calc-grid { grid-template-columns: minmax(0, 440px) minmax(0, 1fr); column-gap: 56px; }
+  }
+
+  /* Крупная сумма тянется по ширине жёлтого блока: 13 знаков «78 000 000 ₽» + «/мес» влезают в 286 px */
+  .calc-big { font-size: clamp(22px, 11cqi, 40px); }
+  .calc-per { font-size: .42em; margin-left: .2em; letter-spacing: 0; }
+
+  .step {
+    display: grid; place-items: center;
+    width: 44px; height: 44px;
+    border: 1px solid var(--color-line);
+    font-family: var(--font-mono); font-size: 20px; line-height: 1;
+    color: var(--color-fg); cursor: pointer;
+    transition: border-color .15s, background-color .15s;
+  }
+  .step:hover { border-color: var(--color-mut); }
+  .step:active { background: var(--color-line); }
+  .units { appearance: textfield; -moz-appearance: textfield; border-radius: 0; }
+  .units::-webkit-outer-spin-button, .units::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+  select { border-radius: 0; }
+
+  /* Ползунок: жёлтая заполненная часть до значения (--p), квадратный бегунок как метка на потолке */
+  .range { -webkit-appearance: none; appearance: none; height: 44px; background: transparent; cursor: pointer; }
+  .range::-webkit-slider-runnable-track { height: 4px; background: linear-gradient(90deg, var(--color-acc) var(--p, 0%), var(--color-line) var(--p, 0%)); }
+  .range::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: 24px; height: 24px; margin-top: -10px;
+    background: var(--color-acc); border: 5px solid var(--color-bg2); outline: 1px solid var(--color-acc);
+  }
+  .range::-moz-range-track { height: 4px; background: var(--color-line); }
+  .range::-moz-range-progress { height: 4px; background: var(--color-acc); }
+  .range::-moz-range-thumb { width: 14px; height: 14px; border-radius: 0; background: var(--color-acc); border: 5px solid var(--color-bg2); outline: 1px solid var(--color-acc); }
+
+  .check {
+    appearance: none; -webkit-appearance: none;
+    width: 22px; height: 22px; margin: 0;
+    border: 1.5px solid var(--color-mut); border-radius: 0; background: transparent center / 14px no-repeat;
+    cursor: pointer; transition: background-color .15s, border-color .15s;
+  }
+  .check:checked {
+    border-color: var(--color-acc);
+    background-color: var(--color-acc);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14'%3E%3Cpath d='M2 7.5l3.2 3.2L12 3.8' fill='none' stroke='%23111' stroke-width='2.4'/%3E%3C/svg%3E");
+  }
+
+  .bar-row { display: grid; grid-template-columns: 72px minmax(0, 1fr) 76px; align-items: center; gap: 12px; }
+  .bar { display: block; height: 100%; transition: width .5s cubic-bezier(.2, .7, .2, 1); }
+</style>
