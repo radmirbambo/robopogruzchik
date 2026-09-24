@@ -32,5 +32,10 @@ const og = new URL(import.meta.env.BASE_URL + 'og.png', Astro.site).href;
 </head>
 <body class="bg-bg text-fg antialiased">
   <slot />
+  <!-- UTM сохраняются на любой странице входа (в т. ч. /privacy/), форма заявки заберёт их из sessionStorage -->
+  <script>
+    import { captureUtm, safeSession } from '../lib/utm';
+    captureUtm(safeSession(), location.search, location.pathname);
+  </script>
 </body>
 </html>

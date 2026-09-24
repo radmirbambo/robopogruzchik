@@ -1,0 +1,13 @@
+---
+// Вордмарк-ссылка на главную для футера и служебных страниц — как в шапке: до lg в две строки
+const base = import.meta.env.BASE_URL;
+---
+<a href={base} class="-my-1 inline-flex min-h-11 items-center gap-2.5 py-1" aria-label="Беспилотный погрузчик — на главную">
+  <span class="mark inline-block size-[22px] shrink-0 lg:size-[18px]" aria-hidden="true"></span>
+  <span class="font-display text-[11px] leading-[1.08] font-extrabold tracking-wide lg:text-[13px] lg:leading-none" aria-hidden="true">
+    <span class="block lg:inline">БЕСПИЛОТНЫЙ</span> <span class="block lg:inline">ПОГРУЗЧИК</span>
+  </span>
+</a>
+<style>
+  .mark { background: repeating-linear-gradient(-45deg, var(--color-acc) 0 4px, #111 4px 8px); }
+</style>

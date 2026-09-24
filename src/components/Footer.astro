@@ -1,0 +1,37 @@
+---
+import { SITE } from '../config';
+import { contactList } from '../lib/contacts';
+import Wordmark from './Wordmark.astro';
+
+const base = import.meta.env.BASE_URL;
+const privacy = base + 'privacy/';
+const contacts = contactList(SITE);
+const { name, status, inn } = SITE.operator;
+---
+<footer>
+  <div class="hazard h-2" aria-hidden="true"></div>
+  <div class="container-x">
+    <div class="grid gap-10 py-12 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] md:gap-14 md:py-16">
+      <div>
+        <Wordmark />
+        <p class="mt-5 max-w-[480px] text-sm leading-relaxed text-pretty text-mut">Продажи и внедрение: {name}, {status}, ИНН&nbsp;{inn} — официальный партнёр ООО «Беспилотный погрузчик»</p>
+      </div>
+      <ul class="grid content-start gap-4">
+        {contacts.map((c) => (
+          <li>
+            <a href={c.href} data-goal={c.goal} target={c.external ? '_blank' : undefined} rel={c.external ? 'noopener' : undefined}
+              class="group inline-flex min-h-11 flex-col justify-center">
+              <span class="font-mono text-[10px] tracking-[.08em] text-mut uppercase">{c.label}</span>
+              <span class="mt-1 text-[15px] break-all transition-colors group-hover:text-acc">{c.value}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+    <div class="flex flex-col gap-2 border-t border-line py-5 font-mono text-[11px] tracking-[.06em] text-mut uppercase sm:flex-row sm:items-center sm:justify-between">
+      <a href={privacy} aria-current={Astro.url.pathname === privacy ? 'page' : undefined}
+        class="-my-2 inline-flex min-h-11 items-center underline decoration-line underline-offset-4 transition-colors hover:text-fg">Политика обработки персональных данных</a>
+      <p>© 2026</p>
+    </div>
+  </div>
+</footer>

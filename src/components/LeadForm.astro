@@ -1,0 +1,61 @@
+---
+// Заявка: iframe Яндекс Формы (src ставит scripts/leadform.ts — лениво и с предзаполнением из калькулятора).
+// Пока форма не создана (SITE.form.baseUrl пуст, Task 10) — вместо iframe контакты.
+import { SITE } from '../config';
+import { contactList } from '../lib/contacts';
+
+const contacts = contactList(SITE);
+const { id, baseUrl } = SITE.form;
+---
+<section id="lead" class="border-t border-line py-20 md:py-28" aria-labelledby="lead-title">
+  <div class="container-x">
+    <p class="tag">// Заявка</p>
+    <h2 id="lead-title" class="lead-title mt-4 font-bold text-balance md:mt-5">Получите КП под ваш склад</h2>
+    <p class="mt-5 max-w-[520px] text-base leading-relaxed text-pretty text-mut md:mt-6 md:text-[17px]">Ответим в течение рабочего дня. Расчёт калькулятора подставится автоматически.</p>
+
+    {baseUrl ? (
+      <div class="mt-10 grid gap-10 md:mt-14 lg:grid-cols-[minmax(0,320px)_minmax(0,1fr)] lg:gap-14 xl:grid-cols-[minmax(0,360px)_minmax(0,1fr)]">
+        <div class="hidden lg:block">
+          <div class="sticky top-24">
+            <p class="font-mono text-[11px] tracking-[.08em] text-mut uppercase">Или напрямую</p>
+            <ul class="mt-4 border-b border-line">
+              {contacts.map((c) => (
+                <li class="border-t border-line">
+                  <a href={c.href} data-goal={c.goal} target={c.external ? '_blank' : undefined} rel={c.external ? 'noopener' : undefined}
+                    class="group flex flex-col gap-1.5 py-5">
+                    <span class="font-mono text-[10px] tracking-[.08em] text-mut uppercase">{c.label}</span>
+                    <span class="text-[19px] font-medium break-words transition-colors group-hover:text-acc">{c.value}</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+        <div class="min-h-[760px] border border-line bg-bg2">
+          <iframe data-yaform name={`ya-form-${id}`} title="Заявка" loading="lazy" class="block h-[900px] w-full border-0"></iframe>
+        </div>
+      </div>
+    ) : (
+      <div class="mt-10 max-w-[640px] border border-line bg-bg2 p-5 md:mt-14 md:p-8">
+        <p class="text-[17px] leading-snug font-medium md:text-lg">Форма подключается. Напишите нам:</p>
+        <ul class="mt-5 border-b border-dashed border-line">
+          {contacts.map((c) => (
+            <li class="border-t border-dashed border-line">
+              <a href={c.href} data-goal={c.goal} target={c.external ? '_blank' : undefined} rel={c.external ? 'noopener' : undefined}
+                class="group flex min-h-13 flex-wrap items-baseline justify-between gap-x-4 gap-y-1 py-3">
+                <span class="font-mono text-[10px] tracking-[.08em] text-mut uppercase">{c.label}</span>
+                <span class="text-[17px] font-medium break-all transition-colors group-hover:text-acc">{c.value}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    )}
+  </div>
+</section>
+{baseUrl && <script is:inline src="https://forms.yandex.ru/_static/embed.js" defer></script>}
+<script>import '../scripts/leadform.ts';</script>
+<style>
+  /* Две строки на 360–390 (самая длинная «ПОД ВАШ СКЛАД» = 11,3 em), одна на десктопе (20,7 em) */
+  .lead-title { font-size: clamp(24px, calc((100vw - 32px) / 13), 44px); }
+</style>
