@@ -2,14 +2,10 @@
 // Изометрический line-art 200×160 для шагов «Как это работает».
 // Тележка — геометрия из мокапа C «Чертёж», ужатая под 200×160: корпус-ромб, стойки, вилы, рукоять.
 // Жёлтым — только то, что добавляем мы: камера, лучи к меткам, задача из WMS.
+// Цвета — токены темы через утилиты Tailwind stroke-*/fill-* (fg, acc, mut, bg2).
+// Экраны WMS залиты bg2 = фон панели шага: задние экраны стопки прячутся за передним.
 interface Props { kind: 'truck' | 'pak' | 'markers' | 'wms'; class?: string }
 const { kind, class: cls = '' } = Astro.props;
-
-const FG = '#F2F0EA';
-const ACC = '#FFC629';
-const MUT = '#8C9098';
-// Заливка экранов = фон панели шага (bg2): задние экраны стопки прячутся за передним
-const PANEL = '#1C1F23';
 
 const TRUCK = [
   'M40 80 l60 -30 l60 30 l-60 30z', // корпус
@@ -40,50 +36,50 @@ const stacks = [10, 70, 130].map((x, s) => ({ x, y: 22, hot: s === 2 }));
 <svg class:list={['iso', cls]} viewBox="0 0 200 160" fill="none" stroke-linejoin="round" stroke-linecap="round"
   aria-hidden="true" focusable="false">
   {(kind === 'truck' || kind === 'pak') && (
-    <g stroke={FG} stroke-width="1.4">{TRUCK.map((d) => <path d={d} />)}</g>
+    <g class="stroke-fg" stroke-width="1.4">{TRUCK.map((d) => <path d={d} />)}</g>
   )}
 
   {kind === 'pak' && (
     <>
-      <g stroke={ACC} stroke-dasharray="3 4" opacity=".8"><path d="M82 34 L34 17 M82 34 L156 17" /></g>
-      <g fill={FG}><path d={diamond(34, 12, 10)} /><path d={diamond(156, 12, 10)} /></g>
-      <path d={MAST} stroke={FG} stroke-width="1.4" />
-      <path d={CAM} fill={ACC} /><path d={CAM_EDGES} stroke={PANEL} stroke-width="1" />
+      <g class="stroke-acc" stroke-dasharray="3 4" opacity=".8"><path d="M82 34 L34 17 M82 34 L156 17" /></g>
+      <g class="fill-fg"><path d={diamond(34, 12, 10)} /><path d={diamond(156, 12, 10)} /></g>
+      <path d={MAST} class="stroke-fg" stroke-width="1.4" />
+      <path d={CAM} class="fill-acc" /><path d={CAM_EDGES} class="stroke-bg2" stroke-width="1" />
     </>
   )}
 
   {kind === 'markers' && (
     <>
-      <path d="M16 46 l84 -42 l84 42 l-84 42z" stroke={MUT} opacity=".6" />
-      <path d={LATTICE} stroke={MUT} opacity=".45" />
-      <g stroke={ACC} stroke-dasharray="3 4" opacity=".8">{rays.map((m) => <path d={`M${m.x} ${m.y + 3.5} V${m.y + DROP - 3.5}`} />)}</g>
-      <g stroke={ACC} stroke-width="1.4">{rays.map((m) => <path d={diamond(m.x, m.y + DROP)} />)}</g>
-      <g fill={FG}>{grid.map((m) => <path d={diamond(m.x, m.y)} />)}</g>
-      <path d={`M8 46 V${46 + DROP} M4 46 h8 M4 ${46 + DROP} h8`} stroke={MUT} />
+      <path d="M16 46 l84 -42 l84 42 l-84 42z" class="stroke-mut" opacity=".6" />
+      <path d={LATTICE} class="stroke-mut" opacity=".45" />
+      <g class="stroke-acc" stroke-dasharray="3 4" opacity=".8">{rays.map((m) => <path d={`M${m.x} ${m.y + 3.5} V${m.y + DROP - 3.5}`} />)}</g>
+      <g class="stroke-acc" stroke-width="1.4">{rays.map((m) => <path d={diamond(m.x, m.y + DROP)} />)}</g>
+      <g class="fill-fg">{grid.map((m) => <path d={diamond(m.x, m.y)} />)}</g>
+      <path d={`M8 46 V${46 + DROP} M4 46 h8 M4 ${46 + DROP} h8`} class="stroke-mut" />
     </>
   )}
 
   {kind === 'wms' && (
     <>
-      <path d="M28 57 L100 80 M88 57 L100 80 M148 57 L100 80" stroke={MUT} stroke-dasharray="3 4" />
+      <path d="M28 57 L100 80 M88 57 L100 80 M148 57 L100 80" class="stroke-mut" stroke-dasharray="3 4" />
       {stacks.map(({ x, y, hot }) => (
         <g stroke-width="1.4">
-          <path d={screen(x + 12, y - 6)} fill={PANEL} stroke={FG} opacity=".5" />
-          <path d={screen(x + 6, y - 3)} fill={PANEL} stroke={FG} opacity=".75" />
-          <path d={screen(x, y)} fill={PANEL} stroke={FG} />
-          {rows(x, y).map((d, r) => <path d={d} stroke={hot && r === 0 ? ACC : MUT} />)}
+          <path d={screen(x + 12, y - 6)} class="fill-bg2 stroke-fg" opacity=".5" />
+          <path d={screen(x + 6, y - 3)} class="fill-bg2 stroke-fg" opacity=".75" />
+          <path d={screen(x, y)} class="fill-bg2 stroke-fg" />
+          {rows(x, y).map((d, r) => <path d={d} class={hot && r === 0 ? 'stroke-acc' : 'stroke-mut'} />)}
         </g>
       ))}
-      <path d="M100 80 V102 M95 96 l5 6 l5 -6" stroke={ACC} stroke-width="1.4" />
+      <path d="M100 80 V102 M95 96 l5 6 l5 -6" class="stroke-acc" stroke-width="1.4" />
       {/* Робот = тележка с ПАК в масштабе 0,4; толщина обводки компенсирует масштаб */}
       <g transform="translate(66 92) scale(.4)">
-        <g stroke={FG} stroke-width="3.5">{TRUCK.map((d) => <path d={d} />)}<path d={MAST} /></g>
-        <path d={CAM} fill={ACC} />
+        <g class="stroke-fg" stroke-width="3.5">{TRUCK.map((d) => <path d={d} />)}<path d={MAST} /></g>
+        <path d={CAM} class="fill-acc" />
       </g>
     </>
   )}
 
-  <g font-family="JetBrains Mono, monospace" font-size="10" fill={MUT}>
+  <g font-family="JetBrains Mono, monospace" font-size="10" class="fill-mut">
     {kind === 'truck' && <text x="120" y="152">1,5–3 т</text>}
     {kind === 'pak' && (
       <>
