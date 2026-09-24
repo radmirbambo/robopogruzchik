@@ -1,13 +1,10 @@
 @import "tailwindcss";
-@import "@fontsource/unbounded/cyrillic-700.css";
-@import "@fontsource/unbounded/latin-700.css";
-@import "@fontsource/unbounded/cyrillic-800.css";
-@import "@fontsource/onest/cyrillic-400.css";
-@import "@fontsource/onest/latin-400.css";
-@import "@fontsource/onest/cyrillic-500.css";
-@import "@fontsource/onest/cyrillic-700.css";
-@import "@fontsource/jetbrains-mono/cyrillic-400.css";
-@import "@fontsource/jetbrains-mono/latin-400.css";
+@import "@fontsource/unbounded/700.css";
+@import "@fontsource/unbounded/800.css";
+@import "@fontsource/onest/400.css";
+@import "@fontsource/onest/500.css";
+@import "@fontsource/onest/700.css";
+@import "@fontsource/jetbrains-mono/400.css";
 
 @theme {
   --color-bg: #15171A;
