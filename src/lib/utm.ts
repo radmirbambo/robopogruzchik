@@ -15,11 +15,15 @@ export function safeSession(): Storage | null {
   try { const s = window.sessionStorage; s.setItem('__t', '1'); s.removeItem('__t'); return s; } catch { return null; }
 }
 
+/** Только чтение того, что сохранил captureUtm (он вызывается один раз на странице — в Base.astro). */
+export function readUtm(storage: Pick<Storage, 'getItem'> | null): { utm: Utm; landing: string } | null {
+  try { const raw = storage?.getItem(KEY); return raw ? JSON.parse(raw) : null; } catch { return null; }
+}
+
 export function captureUtm(storage: Store | null, search: string, page: string): { utm: Utm; landing: string } {
   const fresh = parseUtm(search);
   const hasFresh = Object.keys(fresh).length > 0;
-  let saved: { utm: Utm; landing: string } | null = null;
-  try { const raw = storage?.getItem(KEY); if (raw) saved = JSON.parse(raw); } catch { saved = null; }
+  const saved = readUtm(storage);
   const result = hasFresh || !saved ? { utm: fresh, landing: page } : saved;
   if (hasFresh || !saved) { try { storage?.setItem(KEY, JSON.stringify(result)); } catch { /* хранилище недоступно */ } }
   return result;
