@@ -15,8 +15,8 @@ export const SITE = {
   webmasterVerification: '', // P3
   form: {
     // Заполняется скриптом integrations/yandex-form/create-form.mjs
-    id: '',
-    baseUrl: '',
+    id: '6ab5a539898afd0b8e81a4f6',
+    baseUrl: 'https://forms.yandex.ru/cloud/6ab5a539898afd0b8e81a4f6/',
   },
   pricesIncludeVat: null as null | boolean, // P5: null = не пишем про НДС
 } as const;
