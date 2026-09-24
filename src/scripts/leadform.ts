@@ -16,8 +16,22 @@ function context(): LeadContext {
   return { ...prefill, utm: saved.utm, page: saved.landing };
 }
 
+// embed.js Яндекс Форм подгоняет высоту iframe под форму. Грузим его вместе с формой, а не со страницей:
+// его домен ставит сторонние cookie (R22). Скрипт вешает слушатель message раньше, чем форма успеет
+// загрузиться и прислать высоту; до этого iframe держит фиксированную высоту из разметки.
+let embedded = false;
+function embed() {
+  if (embedded) return;
+  embedded = true;
+  const s = document.createElement('script');
+  s.src = 'https://forms.yandex.ru/_static/embed.js';
+  s.async = true;
+  document.head.appendChild(s);
+}
+
 function load() {
   if (!frame || !SITE.form.baseUrl || engaged) return;
+  embed();
   const url = buildFormUrl(SITE.form.baseUrl, context());
   if (frame.getAttribute('src') !== url) frame.src = url;
 }

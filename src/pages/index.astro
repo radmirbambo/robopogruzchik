@@ -13,8 +13,17 @@ import Faq from '../components/Faq.astro';
 import LeadForm from '../components/LeadForm.astro';
 import Footer from '../components/Footer.astro';
 import CookieBar from '../components/CookieBar.astro';
+import { seoJsonLd } from '../lib/seo';
+
+// Абсолютные адреса для JSON-LD: сайт живёт под BASE_URL (/robopogruzchik/ до покупки домена)
+const home = new URL(import.meta.env.BASE_URL, Astro.site).href;
+const jsonLd = seoJsonLd(home, new URL('favicon.svg', home).href, new URL('og.png', home).href);
 ---
-<Base title="Беспилотный погрузчик" description="Робот для перевозки паллет">
+<Base
+  title="Беспилотный погрузчик — робот для перевозки паллет | окупаемость от 5 мес"
+  description="Роботизированный погрузчик для склада: ставим ПАК на вашу тележку для паллет и заменяем водителя, который стоит от 200 000 ₽/мес. Автономная навигация без лидара, интеграция с WMS, внедрение без остановки склада. Калькулятор окупаемости."
+  jsonLd={jsonLd}
+>
   <Header />
   <main>
     <Hero />

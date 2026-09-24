@@ -28,11 +28,14 @@ const og = new URL(import.meta.env.BASE_URL + 'og.png', Astro.site).href;
   {SITE.webmasterVerification && <meta name="yandex-verification" content={SITE.webmasterVerification} />}
   <link rel="icon" href={import.meta.env.BASE_URL + 'favicon.svg'} type="image/svg+xml" />
   <link rel="sitemap" href={import.meta.env.BASE_URL + 'sitemap-index.xml'} />
-  {jsonLd.map((j) => <script type="application/ld+json" set:html={JSON.stringify(j)} />)}
+  <!-- \u003c вместо «<»: текст из данных не закроет тег script -->
+  {jsonLd.map((j) => <script type="application/ld+json" set:html={JSON.stringify(j).replace(/</g, '\\u003c')} />)}
   <!-- Единственный захват UTM: на любой странице входа (в т. ч. /privacy/). Модуль в head выполняется раньше
-       модулей из body, поэтому форма заявки (scripts/leadform.ts) уже читает готовое из sessionStorage -->
+       модулей из body, поэтому форма заявки (scripts/leadform.ts) уже читает готовое из sessionStorage.
+       Тот же модуль подключает Метрику (одним запросом меньше): тег грузится по первому действию (scripts/analytics.ts) -->
   <script>
     import { captureUtm, safeSession } from '../lib/utm';
+    import '../scripts/analytics';
     captureUtm(safeSession(), location.search, location.pathname);
   </script>
 </head>
