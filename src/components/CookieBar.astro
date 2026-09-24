@@ -1,0 +1,26 @@
+---
+// Уведомление о cookie и Метрике. Без JS не показывается (без JS нет и Метрики).
+const base = import.meta.env.BASE_URL;
+---
+<div data-cookiebar hidden role="region" aria-label="Уведомление о cookie" class="fixed inset-x-0 bottom-0 z-40 sm:px-4">
+  <div class="cookie mx-auto flex max-w-[640px] items-center gap-4 border-t border-line bg-bg2 px-4 pt-3 sm:border-x sm:px-5">
+    <p class="text-[13px] leading-snug text-pretty text-mut">Мы используем cookie и Яндекс.Метрику, чтобы сайт работал лучше. Подробнее&nbsp;— <a href={base + 'privacy/'} class="text-fg underline decoration-mut underline-offset-2 hover:decoration-fg">в&nbsp;политике</a>.</p>
+    <button type="button" data-cookie-ok class="min-h-11 min-w-16 shrink-0 border border-mut px-4 text-sm font-bold text-fg transition-colors hover:border-fg hover:bg-fg hover:text-black">Ок</button>
+  </div>
+</div>
+<script>
+  const KEY = 'af_cookie';
+  const bar = document.querySelector<HTMLElement>('[data-cookiebar]');
+  let seen = false;
+  try { seen = localStorage.getItem(KEY) === '1'; } catch { /* хранилище недоступно — покажем плашку */ }
+  if (bar && !seen) {
+    bar.hidden = false;
+    bar.querySelector('[data-cookie-ok]')?.addEventListener('click', () => {
+      bar.hidden = true;
+      try { localStorage.setItem(KEY, '1'); } catch { /* не сохранить — плашка закрыта до перезагрузки страницы */ }
+    });
+  }
+</script>
+<style>
+  .cookie { padding-bottom: calc(12px + env(safe-area-inset-bottom)); }
+</style>

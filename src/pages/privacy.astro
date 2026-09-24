@@ -1,0 +1,109 @@
+---
+import Base from '../layouts/Base.astro';
+import Wordmark from '../components/Wordmark.astro';
+import Footer from '../components/Footer.astro';
+import CookieBar from '../components/CookieBar.astro';
+import { SITE } from '../config';
+import { contactList } from '../lib/contacts';
+
+const base = import.meta.env.BASE_URL;
+const { name, status, inn } = SITE.operator;
+const contacts = contactList(SITE);
+const email = contacts.find((c) => c.goal === 'click_email')!;
+const link = 'underline decoration-mut underline-offset-4 transition-colors hover:text-acc hover:decoration-acc';
+---
+<Base title="Политика обработки персональных данных" description="Как сайт «Беспилотный погрузчик» обрабатывает персональные данные из формы заявки, cookie и Яндекс.Метрики: оператор, цели, сроки, права и отзыв согласия." path="privacy/">
+  <header class="border-b border-line">
+    <div class="container-x flex h-14 items-center justify-between gap-4 md:h-16">
+      <Wordmark />
+      <a href={base} class="-mr-2 inline-flex min-h-11 items-center px-2 text-sm text-mut transition-colors hover:text-fg"><span aria-hidden="true">←&nbsp;</span>На главную</a>
+    </div>
+  </header>
+
+  <main class="container-x py-14 md:py-20">
+    <article class="doc max-w-[760px]">
+      <p class="tag">// Документ</p>
+      <h1 class="doc-title mt-4 font-bold md:mt-5">Политика обработки персональных данных</h1>
+      <p class="mt-5 font-mono text-[11px] tracking-[.08em] text-mut uppercase">Редакция от 25.09.2026</p>
+      <p class="mt-8">Политика описывает, какие персональные данные собирает сайт «{SITE.brand}», зачем и как долго они хранятся и как отозвать согласие. Обработка ведётся по Федеральному закону от 27.07.2006 <span class="whitespace-nowrap">№&nbsp;152-ФЗ</span> «О&nbsp;персональных данных».</p>
+
+      <section aria-labelledby="p1">
+        <h2 id="p1"><span aria-hidden="true">01</span>Оператор</h2>
+        <p>Оператор персональных данных — {name}, {status}, ИНН&nbsp;{inn}. Оператор ведёт продажи и внедрение как официальный партнёр ООО «Беспилотный погрузчик».</p>
+        <ul>
+          {contacts.map((c) => (
+            <li>{c.label}: <a href={c.href} data-goal={c.goal} target={c.external ? '_blank' : undefined} rel={c.external ? 'noopener' : undefined} class={link}>{c.value}</a></li>
+          ))}
+        </ul>
+      </section>
+
+      <section aria-labelledby="p2">
+        <h2 id="p2"><span aria-hidden="true">02</span>Какие данные мы обрабатываем</h2>
+        <ul>
+          <li>из формы заявки: имя, компания, телефон, email, город и комментарий к заявке;</li>
+          <li>параметры склада из калькулятора: число погрузчиков, режим работы, регион, зарплата водителя, выбранный тариф;</li>
+          <li>UTM-метки и адрес страницы, с которой вы пришли на сайт;</li>
+          <li>cookie и данные Яндекс.Метрики: <span class="whitespace-nowrap">IP-адрес</span>, сведения о браузере и устройстве, источник перехода, действия на страницах сайта.</li>
+        </ul>
+      </section>
+
+      <section aria-labelledby="p3">
+        <h2 id="p3"><span aria-hidden="true">03</span>Цели обработки</h2>
+        <ul>
+          <li>ответ на заявку и связь с вами;</li>
+          <li>подготовка коммерческого предложения;</li>
+          <li>аналитика сайта: понять, какие разделы полезны, и сделать сайт удобнее.</li>
+        </ul>
+      </section>
+
+      <section aria-labelledby="p4">
+        <h2 id="p4"><span aria-hidden="true">04</span>Правовое основание</h2>
+        <p>Согласие субъекта персональных данных <span class="whitespace-nowrap">(п.&nbsp;1 ч.&nbsp;1 ст.&nbsp;6 152-ФЗ)</span>. Согласие на обработку данных из заявки вы даёте, отмечая соответствующий пункт в форме перед отправкой.</p>
+      </section>
+
+      <section aria-labelledby="p5">
+        <h2 id="p5"><span aria-hidden="true">05</span>Где хранятся данные</h2>
+        <p>Заявки хранятся в сервисе Яндекс Формы (ООО «Яндекс», серверы в России), который обрабатывает их по поручению оператора. Копия заявки со всеми полями приходит в почтовый ящик оператора в Яндекс Почте. Данные Яндекс.Метрики обрабатывает ООО «Яндекс». Персональные данные за рубеж не передаются.</p>
+        <p>Чтобы оператор быстро узнал о новой заявке, ему в Telegram приходит служебное уведомление без персональных данных: число погрузчиков, режим работы, тариф, метки <span class="whitespace-nowrap">utm_source</span> и <span class="whitespace-nowrap">utm_campaign</span>, адрес страницы входа и ссылка на ответ в форме. Ссылка открывается только после входа в Яндекс-аккаунт оператора. Уведомление проходит через ретранслятор на Google Apps Script (Google LLC, США). Имя, компания, телефон, email, город и комментарий в уведомление не попадают.</p>
+      </section>
+
+      <section aria-labelledby="p6">
+        <h2 id="p6"><span aria-hidden="true">06</span>Сроки хранения</h2>
+        <p>До достижения целей обработки или отзыва согласия, но не более 3 лет с момента получения. После этого данные удаляются.</p>
+      </section>
+
+      <section aria-labelledby="p7">
+        <h2 id="p7"><span aria-hidden="true">07</span>Ваши права и отзыв согласия</h2>
+        <p>Вы можете узнать, какие ваши данные обрабатываются, потребовать их уточнения, блокирования или удаления, отозвать согласие, а также обжаловать действия оператора в Роскомнадзоре или в суде.</p>
+        <p>Запрос или отзыв согласия отправьте письмом на <a href={email.href} data-goal={email.goal} class={link}>{email.value}</a>. Оператор ответит в течение 10 рабочих дней, а после отзыва согласия прекратит обработку и удалит данные в течение 30 дней.</p>
+      </section>
+
+      <section aria-labelledby="p8">
+        <h2 id="p8"><span aria-hidden="true">08</span>Cookie и Яндекс.Метрика</h2>
+        <p>Сайт использует cookie и сервис веб-аналитики Яндекс.Метрика (ООО «Яндекс»), в том числе Вебвизор. Метрика собирает сведения о посещении: <span class="whitespace-nowrap">IP-адрес</span>, тип браузера и устройства, источник перехода, просмотренные страницы и действия на них. Оператор использует эти данные в обобщённом виде, чтобы оценивать и улучшать сайт.</p>
+        <p>Кроме того, сайт хранит в вашем браузере UTM-метки (до закрытия вкладки) и отметку о том, что вы закрыли уведомление о cookie. Отключить cookie можно в настройках браузера — сайт продолжит работать.</p>
+      </section>
+
+      <section aria-labelledby="p9">
+        <h2 id="p9"><span aria-hidden="true">09</span>Дата редакции</h2>
+        <p>25.09.2026. Оператор может обновлять политику; действующая редакция всегда опубликована на этой странице.</p>
+      </section>
+    </article>
+  </main>
+
+  <Footer />
+  <CookieBar />
+</Base>
+<style>
+  /* Самое длинное слово «ПЕРСОНАЛЬНЫХ» = 10,97 em в Unbounded 700; делитель 11,5 оставляет ~5 % запаса */
+  .doc-title { font-size: clamp(22px, calc((100vw - 32px) / 11.5), 40px); }
+  .doc { font-size: 16px; line-height: 1.65; text-wrap: pretty; }
+  @media (width >= 768px) { .doc { font-size: 17px; } }
+  .doc section { margin-top: 44px; padding-top: 28px; border-top: 1px solid var(--color-line); }
+  .doc h2 { display: flex; gap: 14px; align-items: baseline; font-size: clamp(16px, 4.4vw, 20px); line-height: 1.2; }
+  .doc h2 span { font-family: var(--font-mono); font-weight: 400; font-size: 12px; letter-spacing: .08em; color: var(--color-acc); }
+  .doc section > * + * { margin-top: 14px; }
+  .doc ul { padding-left: 20px; list-style: square; }
+  .doc li + li { margin-top: 6px; }
+  .doc li::marker { color: var(--color-acc); }
+</style>
