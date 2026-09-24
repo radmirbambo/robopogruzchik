@@ -99,6 +99,7 @@ const roadmap = [
         {team.map((m) => (
           <li class="group min-w-0">
             <div class="aspect-square overflow-hidden bg-bg2">
+              {/* alt="" намеренно: имя и роль — соседний текст, иначе скринридер прочтёт имя дважды */}
               <Image src={m.img} alt="" widths={[180, 360]} sizes="(min-width: 1024px) 220px, (min-width: 768px) 30vw, 46vw"
                 class="size-full object-cover grayscale mix-blend-luminosity transition duration-300 group-hover:grayscale-0 group-hover:mix-blend-normal"
                 loading="lazy" decoding="async" />
