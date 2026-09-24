@@ -1,0 +1,46 @@
+---
+// Четыре шага от обычной тележки до робота в рое + единственное реальное фото роботов.
+// Фото почти квадратное (1292×1098): на ≥ lg режем до 3:2, роботы (y ≈ 145–930) остаются в кадре целиком.
+import { Image } from 'astro:assets';
+import Iso from './Iso.astro';
+import robots from '../assets/robots.jpg';
+
+type Kind = 'truck' | 'pak' | 'markers' | 'wms';
+const steps: { kind: Kind; title: string; text: string }[] = [
+  { kind: 'truck', title: 'Ваша электротележка', text: 'Подходит обычный транспортировщик паллет почти любого производителя. Грузоподъёмность 1,5–\u20603 т.' },
+  { kind: 'pak', title: 'Ставим ПАК', text: 'Камеры и контроллер с ИИ. ИИ наводит вилы на паллету по видео и обычной напольной разметке. Лидара нет. Ручное управление остаётся.' },
+  { kind: 'markers', title: 'Потолочные метки', text: 'Метки 50×50 см с шагом 6 м при потолке 12 м. Они не стираются, как разметка на полу, и не мешают работе склада.' },
+  { kind: 'wms', title: 'Задачи из вашей WMS', text: 'RMS на ROS2 управляет роем роботов и берёт задачи из вашей WMS/ERP. Сценарии заранее проверяем в собственном симуляторе.' },
+];
+---
+<section id="how" class="border-t border-line py-20 md:py-28" aria-labelledby="how-title">
+  <div class="container-x">
+    <p class="tag">// Как это работает</p>
+    <h2 id="how-title" class="how-title mt-4 max-w-[900px] font-bold text-balance md:mt-5">Ваша тележка становится роботом за&nbsp;4&nbsp;шага</h2>
+
+    <ol class="mt-10 grid gap-12 md:mt-14 md:grid-cols-2 md:gap-x-8 lg:grid-cols-4 lg:gap-x-6">
+      {steps.map((s, i) => (
+        <li>
+          <div class="border border-line bg-bg2 p-4 lg:p-3">
+            <Iso kind={s.kind} class="mx-auto max-w-[280px]" />
+          </div>
+          <p class="mt-5 font-mono text-[12px] text-acc">{String(i + 1).padStart(2, '0')}</p>
+          <h3 class="mt-2 text-[17px] font-bold">{s.title}</h3>
+          <p class="mt-3 max-w-[460px] text-[15px] leading-relaxed text-pretty text-mut">{s.text}</p>
+        </li>
+      ))}
+    </ol>
+
+    <figure class="mt-14 md:mt-20">
+      <Image src={robots} widths={[390, 780, 1200]}
+        sizes="(min-width: 1200px) 1136px, (min-width: 768px) calc(100vw - 64px), calc(100vw - 32px)"
+        loading="lazy" alt="Два робота-погрузчика с ПАК, бортовые номера 101 и 102, в проходе склада"
+        class="block h-auto w-full border border-line lg:aspect-[3/2] lg:object-cover lg:object-[50%_45%]" />
+      <figcaption class="mt-3 font-mono text-[11px] tracking-[.08em] text-mut uppercase">ПАК БП-01 на реальном складе</figcaption>
+    </figure>
+  </div>
+</section>
+<style>
+  /* Как у калькулятора: самое длинное слово «СТАНОВИТСЯ» ≈ 8,5 em влезает в 360 px */
+  .how-title { font-size: clamp(22px, calc((100vw - 32px) / 15), 44px); }
+</style>

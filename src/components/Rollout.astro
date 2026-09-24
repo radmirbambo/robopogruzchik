@@ -1,0 +1,73 @@
+---
+// Этапы внедрения: вертикальный таймлайн с жёлтой линией до 1280 px, горизонтальный степпер
+// шире (в 1/6 от 1024 px заголовки этапов не помещаются). you: null — от клиента ничего не нужно.
+const stages: { title: string; we: string; you: string | null }[] = [
+  { title: 'Аудит склада', we: 'смотрим потолки, проезды, тележки, WMS', you: 'план склада и 2–\u20603 часа вашего инженера' },
+  { title: 'Проект и симуляция', we: 'моделируем маршруты и нагрузку в нашем симуляторе', you: 'согласовать сценарии' },
+  { title: 'Монтаж', we: 'вешаем метки и ставим ПАК в рабочем режиме склада', you: 'доступ в зону на время монтажа' },
+  { title: 'Пилот', we: 'робот работает на реальных задачах рядом с людьми', you: 'ответственный на складе' },
+  { title: 'Интеграция с WMS', we: 'задачи идут напрямую из вашей системы', you: 'доступ к API/обмену WMS' },
+  { title: 'Масштабирование', we: 'добавляем роботов, RMS распределяет задачи', you: null },
+];
+---
+<section id="rollout" class="border-t border-line py-20 md:py-28" aria-labelledby="rollout-title">
+  <div class="container-x">
+    <p class="tag">// Внедрение</p>
+    <h2 id="rollout-title" class="ro-title mt-4 max-w-[900px] font-bold text-balance md:mt-5">Внедряем, не&nbsp;останавливая склад</h2>
+
+    <ol class="ro mt-10 md:mt-14">
+      {stages.map((s, i) => (
+        <li class="ro-step">
+          <span class="ro-node" aria-hidden="true"></span>
+          <p class="font-mono text-[12px] leading-4 text-acc">{String(i + 1).padStart(2, '0')}</p>
+          <h3 class="ro-h mt-2 font-bold">{s.title}</h3>
+          <dl class="mt-3 grid gap-3 text-[15px] leading-snug sm:max-w-[760px] sm:grid-cols-2 sm:gap-6 xl:grid-cols-1 xl:gap-3">
+            <div>
+              <dt class="font-mono text-[10px] tracking-[.06em] text-mut uppercase">Делаем мы</dt>
+              <dd class="mt-1">{s.we}</dd>
+            </div>
+            <div>
+              <dt class="font-mono text-[10px] tracking-[.06em] text-mut uppercase">От вас</dt>
+              <dd class="mt-1 text-mut">
+                {s.you ?? <><span aria-hidden="true">—</span><span class="sr-only">ничего не требуется</span></>}
+              </dd>
+            </div>
+          </dl>
+        </li>
+      ))}
+    </ol>
+
+    <div class="mt-12 flex border border-line bg-bg2 md:mt-16">
+      <span class="hazard w-3 shrink-0 md:w-5" aria-hidden="true"></span>
+      <p class="px-4 py-5 font-display text-[15px] leading-tight font-bold uppercase md:px-6 md:text-[20px]">Склад работает всё время внедрения</p>
+    </div>
+  </div>
+</section>
+<style>
+  .ro-title { font-size: clamp(22px, calc((100vw - 32px) / 15), 44px); }
+  .ro-h { font-size: 16px; }
+
+  /* Таймлайн: квадрат-метка на каждом этапе, жёлтая линия от метки до следующей */
+  .ro-step { position: relative; padding: 0 0 40px 40px; }
+  .ro-step:last-child { padding-bottom: 0; }
+  .ro-node {
+    position: absolute; left: 0; top: 0;
+    width: 16px; height: 16px;
+    border: 2px solid var(--color-acc); background: var(--color-bg);
+  }
+  .ro-step:first-child .ro-node { background: var(--color-acc); }
+  .ro-step:not(:last-child)::before {
+    content: ''; position: absolute;
+    left: 7px; top: 16px; bottom: 0; width: 2px;
+    background: var(--color-acc);
+  }
+
+  /* Горизонтальный степпер. «МАСШТАБИРОВАНИЕ» в Unbounded 14 px ≈ 197 px — шире 1/6 контейнера,
+     поэтому колонка не уже своего самого длинного слова, остальные делят остаток поровну */
+  @media (width >= 1280px) {
+    .ro { display: grid; grid-template-columns: repeat(6, minmax(min-content, 1fr)); column-gap: 24px; }
+    .ro-step, .ro-step:last-child { padding: 36px 0 0; }
+    .ro-step:not(:last-child)::before { left: 16px; right: -24px; top: 7px; bottom: auto; width: auto; height: 2px; }
+    .ro-h { font-size: 14px; }
+  }
+</style>
