@@ -15,8 +15,14 @@ const base = import.meta.env.BASE_URL;
   try { seen = localStorage.getItem(KEY) === '1'; } catch { /* хранилище недоступно — покажем плашку */ }
   if (bar && !seen) {
     bar.hidden = false;
+    // Пока плашка видна, страница длиннее на её высоту: последняя строка футера не прячется под плашкой.
+    // ResizeObserver — высота меняется с шириной экрана (перенос текста)
+    const ro = new ResizeObserver(() => { document.body.style.paddingBottom = `${bar.offsetHeight}px`; });
+    ro.observe(bar);
     bar.querySelector('[data-cookie-ok]')?.addEventListener('click', () => {
       bar.hidden = true;
+      ro.disconnect();
+      document.body.style.paddingBottom = '';
       try { localStorage.setItem(KEY, '1'); } catch { /* не сохранить — плашка закрыта до перезагрузки страницы */ }
     });
   }
