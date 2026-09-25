@@ -1,43 +1,48 @@
-# Astro Starter Kit: Minimal
+# Беспилотный погрузчик — лендинг
+
+Статический сайт на Astro и Tailwind. Сейчас он опубликован на GitHub Pages по адресу
+<https://radmirbambo.github.io/robopogruzchik/> (путь `/robopogruzchik/`), пока не куплен свой домен.
+
+## Запуск и проверка
+
+Нужен Node.js 22.12 или новее.
 
 ```sh
-npm create astro@latest -- --template minimal
+npm ci            # зависимости
+npm run dev       # разработка: http://localhost:4321/robopogruzchik/
+npm test          # юнит-тесты (vitest): калькулятор, форматирование, заявка, UTM, SEO
+npm run build     # сборка в dist/
+npm run preview   # просмотр собранного dist/
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+## Публикация
 
-## 🚀 Project Structure
+Этот репозиторий собирается автоматически из приватного репозитория проекта, поэтому правки вносите там:
+прямые коммиты сюда перезапишет следующая публикация. После пуша в `main` workflow
+`.github/workflows/deploy.yml` прогоняет тесты, собирает сайт и выкладывает его на GitHub Pages.
 
-Inside of your Astro project, you'll see the following folders and files:
+## Что заменить до запуска трафика
 
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
-```
+Все значения лежат в `src/config.ts`:
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+- контакты: `phone`, `phoneHref`, `telegram`, `email`;
+- оператор персональных данных: `operator.name`, `operator.status`, `operator.inn`. Они выводятся
+  в футере и в политике конфиденциальности;
+- `pricesIncludeVat`: `true` или `false` добавит под тарифами «Цены указаны с НДС» или «без НДС».
+  При `null` про НДС ничего не пишем;
+- `webmasterVerification`: код подтверждения из Яндекс Вебмастера (мета-тег `yandex-verification`).
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+Строки `id:` и `baseUrl:` в блоке `form` обновляются автоматически. Меняйте их вручную, только
+сохраняя формат строки.
 
-Any static assets, like images, can be placed in the `public/` directory.
+## Переезд на свой домен
 
-## 🧞 Commands
-
-All commands are run from the root of the project, from a terminal:
-
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+1. В настройках репозитория (Settings → Secrets and variables → Actions → Variables) задайте
+   `SITE_URL=https://ваш-домен` и `BASE_PATH=/`. Canonical, Open Graph, JSON-LD, sitemap и robots.txt
+   соберутся с новым адресом сами.
+2. В Settings → Pages укажите Custom domain, настройте DNS у регистратора и включите Enforce HTTPS.
+3. В Яндекс Формах откройте редактор формы заявки. В подписи к галочке согласия стоит ссылка на политику
+   по старому адресу github.io: замените её на новую.
+4. В Яндекс Метрике в настройках счётчика укажите новый адрес сайта.
+5. В Яндекс Вебмастере добавьте сайт на новом домене, подтвердите права (код — в `webmasterVerification`)
+   и отправьте sitemap.
