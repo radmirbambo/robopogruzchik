@@ -1,5 +1,7 @@
 ---
-// Заявка: iframe Яндекс Формы (src ставит scripts/leadform.ts — лениво и с предзаполнением из калькулятора).
+// Заявка: iframe Яндекс Формы (src ставит scripts/leadform.ts в общем scripts/main.ts — лениво и с предзаполнением
+// из калькулятора; там же embed.js, подгонка высоты iframe, — вместе с формой, не при загрузке страницы).
+// Обёртка держит min-h, пока форма не прислала первую высоту; дальше она по высоте iframe.
 // Пока форма не создана (SITE.form.baseUrl пуст, Task 10) — вместо iframe контакты.
 import { SITE } from '../config';
 import { contactList } from '../lib/contacts';
@@ -31,7 +33,6 @@ const { id, baseUrl } = SITE.form;
             </ul>
           </div>
         </div>
-        <!-- min-h держит место до первой высоты от формы; дальше обёртка по высоте iframe (scripts/leadform.ts) -->
         <div class="min-h-[760px] border border-line bg-bg2">
           <iframe data-yaform name={`ya-form-${id}`} title="Заявка" loading="lazy" class="block h-[900px] w-full border-0"></iframe>
         </div>
@@ -54,8 +55,6 @@ const { id, baseUrl } = SITE.form;
     )}
   </div>
 </section>
-<!-- embed.js (подгонка высоты iframe) scripts/leadform.ts подключает вместе с формой, не при загрузке страницы -->
-<script>import '../scripts/leadform.ts';</script>
 <style>
   /* Две строки на 360–390 (самая длинная «ПОД ВАШ СКЛАД» = 11,3 em), одна на десктопе (20,7 em) */
   .lead-title { font-size: clamp(24px, calc((100vw - 32px) / 13), 44px); }

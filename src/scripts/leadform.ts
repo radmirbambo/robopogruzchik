@@ -1,5 +1,5 @@
 // Iframe Яндекс Формы: src ставим, когда секция близко к экрану или пришёл расчёт из калькулятора/тарифов,
-// чтобы тяжёлая форма не грузилась вместе с первым экраном. UTM сохраняет Base.astro, здесь только читаем.
+// чтобы тяжёлая форма не грузилась вместе с первым экраном. UTM сохраняет scripts/main.ts, здесь только читаем.
 import { SITE } from '../config';
 import { buildFormUrl, formHeight, shrankSharply, type LeadContext } from '../lib/lead';
 import { parseUtm, readUtm, safeSession } from '../lib/utm';

@@ -1,6 +1,9 @@
 ---
 import '../styles/global.css';
 import { SITE } from '../config';
+// Шрифт h1 первого экрана (кириллица Unbounded 700): тот же файл, что в @font-face из global.css (Vite кладёт один
+// ассет по хэшу содержимого). Preload — чтобы заголовок не ждал, пока браузер разберёт CSS и найдёт текст.
+import headingFont from '@fontsource/unbounded/files/unbounded-cyrillic-700-normal.woff2?url';
 interface Props { title: string; description: string; path?: string; jsonLd?: object[] }
 const { title, description, path = '', jsonLd = [] } = Astro.props;
 const canonical = new URL(import.meta.env.BASE_URL + path, Astro.site).href;
@@ -28,18 +31,13 @@ const og = new URL(import.meta.env.BASE_URL + 'og.png', Astro.site).href;
   {SITE.webmasterVerification && <meta name="yandex-verification" content={SITE.webmasterVerification} />}
   <link rel="icon" href={import.meta.env.BASE_URL + 'favicon.svg'} type="image/svg+xml" />
   <link rel="sitemap" href={import.meta.env.BASE_URL + 'sitemap-index.xml'} />
-  <!-- \u003c вместо «<»: текст из данных не закроет тег script -->
-  {jsonLd.map((j) => <script type="application/ld+json" set:html={JSON.stringify(j).replace(/</g, '\\u003c')} />)}
-  <!-- Единственный захват UTM: на любой странице входа (в т. ч. /privacy/). Модуль в head выполняется раньше
-       модулей из body, поэтому форма заявки (scripts/leadform.ts) уже читает готовое из sessionStorage.
-       Тот же модуль подключает Метрику (одним запросом меньше): тег грузится по первому действию (scripts/analytics.ts) -->
-  <script>
-    import { captureUtm, safeSession } from '../lib/utm';
-    import '../scripts/analytics';
-    captureUtm(safeSession(), location.search, location.pathname);
-  </script>
+  <link rel="preload" as="font" type="font/woff2" href={headingFont} crossorigin />
+  <!-- Весь JS сайта — один модуль без цепочки импортов: UTM, Метрика по первому действию, калькулятор, тарифы, форма -->
+  <script>import '../scripts/main.ts';</script>
 </head>
 <body class="bg-bg text-fg antialiased">
   <slot />
+  <!-- JSON-LD в конце body: ~6 КБ, первому экрану не нужны. \u003c вместо «<»: текст из данных не закроет тег script -->
+  {jsonLd.map((j) => <script type="application/ld+json" set:html={JSON.stringify(j).replace(/</g, '\\u003c')} />)}
 </body>
 </html>

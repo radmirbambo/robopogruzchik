@@ -1,6 +1,7 @@
 ---
 // Три публичных тарифа — единственные цены на сайте. Суммы из PRICES, как и в калькуляторе.
 // Пробелы: U+00A0 держит «+» и предлоги с соседним словом, U+202F внутри сумм ставит rub().
+// Клик по CTA — scripts/pricing.ts (в общем scripts/main.ts).
 import { PRICES, type TariffId } from '../lib/calc';
 import { rub } from '../lib/format';
 import { SITE } from '../config';
@@ -56,16 +57,6 @@ const vat = SITE.pricesIncludeVat === null ? null : SITE.pricesIncludeVat ? 'Ц�
     {vat && <p class="mt-5 font-mono text-[11px] tracking-[.06em] text-mut uppercase">{vat}</p>}
   </div>
 </section>
-<script>
-  import { emitLeadPrefill } from '../lib/bus';
-  import type { TariffId } from '../lib/calc';
-
-  // Только тариф: число машин и режим человек здесь не выбирал. Если в форму уже ушёл расчёт калькулятора,
-  // он остаётся — форма складывает события. Прокрутку к форме делает сама ссылка href="#lead"
-  document.querySelectorAll<HTMLAnchorElement>('#pricing [data-tariff]').forEach((a) => a.addEventListener('click', () => {
-    emitLeadPrefill({ tariff: a.dataset.tariff as TariffId });
-  }));
-</script>
 <style>
   .pricing-title { font-size: clamp(26px, calc((100vw - 32px) / 12), 44px); }
 

@@ -15,7 +15,7 @@ export function safeSession(): Storage | null {
   try { const s = window.sessionStorage; s.setItem('__t', '1'); s.removeItem('__t'); return s; } catch { return null; }
 }
 
-/** Только чтение того, что сохранил captureUtm (он вызывается один раз на странице — в Base.astro). */
+/** Только чтение того, что сохранил captureUtm (он вызывается один раз на странице — в scripts/main.ts). */
 export function readUtm(storage: Pick<Storage, 'getItem'> | null): { utm: Utm; landing: string } | null {
   try { const raw = storage?.getItem(KEY); return raw ? JSON.parse(raw) : null; } catch { return null; }
 }
