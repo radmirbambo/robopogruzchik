@@ -13,7 +13,7 @@ const stages: { title: string; we: string; you: string | null }[] = [
 <section id="rollout" class="border-t border-line py-20 md:py-28" aria-labelledby="rollout-title">
   <div class="container-x">
     <p class="tag">// Этапы роботизации склада</p>
-    <h2 id="rollout-title" class="ro-title mt-4 max-w-[900px] font-bold text-balance md:mt-5">Внедряем, не&nbsp;останавливая склад</h2>
+    <h2 id="rollout-title" class="section-title mt-4 max-w-[900px] font-bold text-balance md:mt-5">Внедряем, не&nbsp;останавливая склад</h2>
 
     <ol class="ro mt-10 md:mt-14">
       {stages.map((s, i) => (
@@ -44,7 +44,6 @@ const stages: { title: string; we: string; you: string | null }[] = [
   </div>
 </section>
 <style>
-  .ro-title { font-size: clamp(22px, calc((100vw - 32px) / 15), 44px); }
   .ro-h { font-size: 16px; }
 
   /* Таймлайн: квадрат-метка на каждом этапе, жёлтая линия от метки до следующей */

@@ -31,7 +31,7 @@ const fields = [
 <section id="calc" class="border-t border-line py-20 md:py-28" aria-labelledby="calc-title">
   <div class="container-x">
     <p class="tag">// Калькулятор окупаемости</p>
-    <h2 id="calc-title" class="calc-title mt-4 max-w-[980px] font-bold text-balance md:mt-5">Сколько вы тратите на водителей&nbsp;— и&nbsp;сколько сэкономит робот</h2>
+    <h2 id="calc-title" class="section-title mt-4 max-w-[980px] font-bold text-balance md:mt-5">Сколько вы тратите на водителей&nbsp;— и&nbsp;сколько сэкономит робот</h2>
 
     <div class="calc-grid mt-10 md:mt-14">
       <form class="calc-form border border-line bg-bg2 px-4 md:px-6" aria-label="Параметры расчёта" autocomplete="off" novalidate>
@@ -156,9 +156,6 @@ const fields = [
   </div>
 </section>
 <style>
-  /* Самое длинное слово «СЭКОНОМИТ» ≈ 7,6 em; на 360–390 заголовок в 5 строк, на десктопе в 3 */
-  .calc-title { font-size: clamp(22px, calc((100vw - 32px) / 15), 44px); }
-
   .calc-grid {
     display: grid;
     grid-template-columns: minmax(0, 1fr);

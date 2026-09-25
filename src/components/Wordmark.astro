@@ -1,5 +1,6 @@
 ---
-// Вордмарк-ссылка на главную для футера и служебных страниц — как в шапке: до lg в две строки
+// Вордмарк-ссылка на главную: шапка, футер, служебные страницы. До lg в две строки: одной строкой в Unbounded
+// он шире экрана 360–390 px вместе с кнопкой шапки
 const base = import.meta.env.BASE_URL;
 ---
 <a href={base} class="-my-1 inline-flex min-h-11 items-center gap-2.5 py-1" aria-label="Беспилотный погрузчик — на главную">
@@ -9,5 +10,6 @@ const base = import.meta.env.BASE_URL;
   </span>
 </a>
 <style>
-  .mark { background: repeating-linear-gradient(-45deg, var(--color-acc) 0 4px, var(--color-bg) 4px 8px); }
+  /* Мелкий шаг полосы, как в утверждённом мокапе A: утилита hazard (14/28 px) на 18–22 px читается как один диагональный клин */
+  .mark { background: repeating-linear-gradient(-45deg, var(--color-acc) 0 4px, #111 4px 8px); }
 </style>

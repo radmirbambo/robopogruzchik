@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Фото для лендинга из презентаций компании → site/src/assets/.
-# В PDF есть внутренние цены: отсюда берём только картинки, ни текста, ни чисел.
+# Берём из PDF только картинки — ни текста, ни чисел.
 # materials/ в .gitignore. По умолчанию ищем его в корне основного checkout (работает и из git worktree),
 # MATERIALS_DIR=/путь/к/materials переопределяет.
 # Нужны poppler (pdfimages, pdftoppm) и python3 с Pillow. Запуск из любой папки: bash site/scripts/extract-assets.sh
@@ -21,7 +21,6 @@ mkdir -p "$A"
 
 # Номера картинок — порядок в PDF (pdfimages -list), сверен глазами со слайдами
 pdfimages -all -f 1 -l 1 "$M/deck-novator.pdf" "$T/d1"  && cp "$T/d1-005.jpg" "$A/robots.jpg"
-pdfimages -all -f 4 -l 4 "$M/deck-novator.pdf" "$T/d4"  && cp "$T/d4-002.jpg" "$A/render-pak.jpg"
 pdfimages -all -f 7 -l 8 "$M/russian-fmr.pdf" "$T/f7"   && cp "$T/f7-000.jpg" "$A/mvp-1.jpg" && cp "$T/f7-001.jpg" "$A/mvp-2.jpg" && cp "$T/f7-002.jpg" "$A/mvp-3.jpg"
 
 # Слайд 14 «Команда»: в PDF портреты идут не в порядке слайда

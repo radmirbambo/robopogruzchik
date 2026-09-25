@@ -28,6 +28,9 @@
 }
 
 @utility hazard { background: repeating-linear-gradient(-45deg, var(--color-acc) 0 14px, #111 14px 28px); }
+/* h2 секций с длинными заголовками (калькулятор, «как работает», сравнение, внедрение). Самое длинное слово
+   «СТАНОВИТСЯ» ≈ 8,5 em влезает в 360 px; заголовок калькулятора на 360–390 в 5 строк, на десктопе в 3 */
+@utility section-title { font-size: clamp(22px, calc((100vw - 32px) / 15), 44px); }
 @utility tag { font-family: var(--font-mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--color-acc); }
 @utility container-x {
   width: 100%;

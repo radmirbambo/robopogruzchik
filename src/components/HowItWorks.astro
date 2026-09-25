@@ -16,7 +16,7 @@ const steps: { kind: Kind; title: string; text: string }[] = [
 <section id="how" class="border-t border-line py-20 md:py-28" aria-labelledby="how-title">
   <div class="container-x">
     <p class="tag">// Как это работает</p>
-    <h2 id="how-title" class="how-title mt-4 max-w-[900px] font-bold text-balance md:mt-5">Ваша тележка становится роботом за&nbsp;4&nbsp;шага</h2>
+    <h2 id="how-title" class="section-title mt-4 max-w-[900px] font-bold text-balance md:mt-5">Ваша тележка становится роботом за&nbsp;4&nbsp;шага</h2>
 
     <ol class="mt-10 grid gap-12 md:mt-14 md:grid-cols-2 md:gap-x-8 lg:grid-cols-4 lg:gap-x-6">
       {steps.map((s, i) => (
@@ -40,7 +40,3 @@ const steps: { kind: Kind; title: string; text: string }[] = [
     </figure>
   </div>
 </section>
-<style>
-  /* Как у калькулятора: самое длинное слово «СТАНОВИТСЯ» ≈ 8,5 em влезает в 360 px */
-  .how-title { font-size: clamp(22px, calc((100vw - 32px) / 15), 44px); }
-</style>
