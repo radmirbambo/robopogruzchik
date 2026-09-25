@@ -30,6 +30,20 @@ describe('lead', () => {
     expect(u.searchParams.get(FORM_SLUGS.page)).toBe('/?x=1');
   });
 
+  it('CTA тарифа без калькулятора: только тариф, без выдуманных units/mode/calc (I2)', () => {
+    const u = new URL(buildFormUrl('https://forms.yandex.ru/cloud/abc/', { tariff: 'subscription', utm: {}, page: '/' }));
+    expect(u.searchParams.get(FORM_SLUGS.tariff)).toBe('subscription');
+    for (const k of [FORM_SLUGS.units, FORM_SLUGS.mode, FORM_SLUGS.calc]) expect(u.searchParams.has(k)).toBe(false);
+  });
+
+  it('CTA калькулятора: units/mode/calc без тарифа (I2)', () => {
+    const u = new URL(buildFormUrl('https://forms.yandex.ru/cloud/abc/', { units: 3, mode: 'one', calc: 'расчёт', utm: {}, page: '/' }));
+    expect(u.searchParams.get(FORM_SLUGS.units)).toBe('3');
+    expect(u.searchParams.get(FORM_SLUGS.mode)).toBe('one');
+    expect(u.searchParams.get(FORM_SLUGS.calc)).toBe('расчёт');
+    expect(u.searchParams.has(FORM_SLUGS.tariff)).toBe(false);
+  });
+
   it('не добавляет пустые параметры', () => {
     const u = new URL(buildFormUrl('https://forms.yandex.ru/cloud/abc/', { utm: {}, page: '/' }));
     expect([...u.searchParams.keys()].sort()).toEqual(['iframe', FORM_SLUGS.page, 'theme'].sort());

@@ -57,15 +57,13 @@ const vat = SITE.pricesIncludeVat === null ? null : SITE.pricesIncludeVat ? 'Ц�
   </div>
 </section>
 <script>
-  import { emitLeadPrefill, onLeadPrefill, type LeadPrefill } from '../lib/bus';
+  import { emitLeadPrefill } from '../lib/bus';
   import type { TariffId } from '../lib/calc';
 
-  // Если в форму уже ушёл расчёт калькулятора, выбор тарифа меняет только тариф, а не число машин и режим
-  let last: LeadPrefill = { units: 1, mode: 'two', calc: '' };
-  onLeadPrefill((d) => { last = d; });
-  // Прокрутку к форме делает сама ссылка href="#lead"
+  // Только тариф: число машин и режим человек здесь не выбирал. Если в форму уже ушёл расчёт калькулятора,
+  // он остаётся — форма складывает события. Прокрутку к форме делает сама ссылка href="#lead"
   document.querySelectorAll<HTMLAnchorElement>('#pricing [data-tariff]').forEach((a) => a.addEventListener('click', () => {
-    emitLeadPrefill({ ...last, tariff: a.dataset.tariff as TariffId });
+    emitLeadPrefill({ tariff: a.dataset.tariff as TariffId });
   }));
 </script>
 <style>

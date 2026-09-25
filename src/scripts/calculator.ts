@@ -77,8 +77,9 @@ root.querySelectorAll<HTMLButtonElement>('[data-step]').forEach((b) => b.addEven
 // Прокрутку к форме делает сама ссылка href="#lead" (плавно через CSS, мгновенно при reduced motion)
 $('[data-action=calc-cta]').addEventListener('click', () => {
   goal('calc_cta');
+  // Без тарифа: тариф человек выбирает сам в карточках тарифов, «выгоднее за 3 года» — не его выбор
   emitLeadPrefill({
-    units: last.input.units, mode: last.input.mode, tariff: last.best ?? undefined,
+    units: last.input.units, mode: last.input.mode,
     calc: calcSummary(last, REGIONS[region.value as RegionId].label),
   });
 });
