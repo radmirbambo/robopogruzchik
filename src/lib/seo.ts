@@ -5,15 +5,22 @@ import { PRICES } from './calc';
 
 export function seoJsonLd(url: string, logo: string, image: string): object[] {
   const org = { '@type': 'Organization', name: 'Беспилотный погрузчик', alternateName: 'Russian FMR', url, logo };
-  const offer = (name: string, price: number, unit?: string) => ({
+  // unitCode MON — цена в месяц (UN/CEFACT); без unitCode — разовый платёж
+  const spec = (price: number, unitCode?: string) => ({ '@type': 'UnitPriceSpecification', price, priceCurrency: 'RUB', ...(unitCode ? { unitCode } : {}) });
+  const offer = (name: string, price: number, priceSpecification?: object | object[]) => ({
     '@type': 'Offer', name, priceCurrency: 'RUB', price, availability: 'https://schema.org/InStock', url: url + '#pricing',
-    ...(unit ? { priceSpecification: { '@type': 'UnitPriceSpecification', price, priceCurrency: 'RUB', unitCode: unit } } : {}),
+    ...(priceSpecification ? { priceSpecification } : {}),
   });
   return [
     { '@context': 'https://schema.org', ...org },
     { '@context': 'https://schema.org', '@type': 'Product', name: 'Беспилотный погрузчик — робот для перевозки паллет', image, brand: { '@type': 'Brand', name: 'Беспилотный погрузчик' },
       description: 'Программно-аппаратный комплекс превращает электротележку для паллет в автономного робота: навигация по потолочным меткам и камерам, без лидара, интеграция с WMS.',
-      offers: [offer('Покупка под ключ', PRICES.turnkey), offer('Только ПАК', PRICES.pakCapex), offer('Всё в подписку', PRICES.subMonthly, 'MON')] },
+      offers: [
+        offer('Покупка под ключ', PRICES.turnkey),
+        // ПАК: разовый платёж за комплекс плюс ежемесячная подписка на поддержку и обновления ПО
+        offer('Только ПАК', PRICES.pakCapex, [spec(PRICES.pakCapex), spec(PRICES.pakMonthly, 'MON')]),
+        offer('Всё в подписку', PRICES.subMonthly, spec(PRICES.subMonthly, 'MON')),
+      ] },
     { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: FAQ.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) },
   ];
 }

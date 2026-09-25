@@ -24,9 +24,19 @@ describe('seoJsonLd', () => {
     expect(offers[2].priceSpecification).toMatchObject({ '@type': 'UnitPriceSpecification', price: PRICES.subMonthly, unitCode: 'MON' });
   });
 
-  it('других цен в разметке нет', () => {
+  it('Только ПАК: разовая цена и 80 000 ₽/мес поддержки, как в карточке тарифа', () => {
+    const pak = byType('Product').offers[1];
+    expect(pak.price).toBe(PRICES.pakCapex);
+    expect(pak.priceSpecification).toEqual([
+      { '@type': 'UnitPriceSpecification', price: PRICES.pakCapex, priceCurrency: 'RUB' },
+      { '@type': 'UnitPriceSpecification', price: PRICES.pakMonthly, priceCurrency: 'RUB', unitCode: 'MON' },
+    ]);
+    expect(byType('Product').offers[0].priceSpecification).toBeUndefined();
+  });
+
+  it('других цен в разметке нет: только четыре публичные суммы тарифов', () => {
     const prices = JSON.stringify(blocks).match(/"price":\d+/g)!.map((s) => Number(s.slice(8)));
-    expect(new Set(prices)).toEqual(new Set([PRICES.turnkey, PRICES.pakCapex, PRICES.subMonthly]));
+    expect(new Set(prices)).toEqual(new Set([PRICES.turnkey, PRICES.pakCapex, PRICES.pakMonthly, PRICES.subMonthly]));
   });
 
   it('адреса абсолютные', () => {
