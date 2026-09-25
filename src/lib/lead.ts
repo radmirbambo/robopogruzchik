@@ -37,3 +37,16 @@ export function buildFormUrl(baseUrl: string, ctx: LeadContext): string {
   put(FORM_SLUGS.page, ctx.page);
   return u.toString();
 }
+
+/** Высота формы из сообщения iframe — так её читает embed.js Яндекс Форм: JSON-строка с ключом iframe-height
+ *  (форма шлёт '{"iframe-height":1326,"name":"ya-form-…"}', а ещё служебные 'loading', 'ping' и т. п.). */
+export function formHeight(data: unknown): number | null {
+  if (typeof data !== 'string') return null;
+  try {
+    const h = Number(JSON.parse(data)?.['iframe-height']);
+    return h > 0 ? h : null;
+  } catch { return null; }
+}
+
+/** Форма резко стала ниже (больше чем на 40 %): после «Отправить» вместо полей осталась карточка «Спасибо». */
+export const shrankSharply = (prev: number, next: number): boolean => prev > 0 && next < prev * 0.6;

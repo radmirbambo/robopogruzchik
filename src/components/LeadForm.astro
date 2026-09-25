@@ -31,6 +31,7 @@ const { id, baseUrl } = SITE.form;
             </ul>
           </div>
         </div>
+        <!-- min-h держит место до первой высоты от формы; дальше обёртка по высоте iframe (scripts/leadform.ts) -->
         <div class="min-h-[760px] border border-line bg-bg2">
           <iframe data-yaform name={`ya-form-${id}`} title="Заявка" loading="lazy" class="block h-[900px] w-full border-0"></iframe>
         </div>

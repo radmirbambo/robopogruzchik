@@ -1,7 +1,7 @@
 // Iframe Яндекс Формы: src ставим, когда секция близко к экрану или пришёл расчёт из калькулятора/тарифов,
 // чтобы тяжёлая форма не грузилась вместе с первым экраном. UTM сохраняет Base.astro, здесь только читаем.
 import { SITE } from '../config';
-import { buildFormUrl, type LeadContext } from '../lib/lead';
+import { buildFormUrl, formHeight, shrankSharply, type LeadContext } from '../lib/lead';
 import { parseUtm, readUtm, safeSession } from '../lib/utm';
 import { onLeadPrefill } from '../lib/bus';
 
@@ -39,7 +39,25 @@ function load() {
 // Прокрутку к #lead делают сами ссылки/кнопки CTA, здесь только src
 onLeadPrefill((d) => { prefill = { ...prefill, ...d }; load(); });
 
+// embed.js только меняет высоту iframe и не прокручивает страницу. После «Отправить» внизу длинной формы (~1300 px)
+// она сжимается до карточки «Спасибо», а прокрутка остаётся прежней: человек видел бы пустоту и футер.
+// Поэтому слушаем те же сообщения формы: первая высота снимает min-height обёртки (он держал место, пока форма
+// грузилась), резкое сжатие после ввода возвращает к верху формы. Прокрутка — по CSS: плавно, при reduced motion
+// мгновенно; scroll-padding-top оставляет место под липкой шапкой.
+const FORM_ORIGIN = SITE.form.baseUrl ? new URL(SITE.form.baseUrl).origin : '';
+let height = 0;
+function onMessage(e: MessageEvent) {
+  if (!frame || e.origin !== FORM_ORIGIN || e.source !== frame.contentWindow) return;
+  const h = formHeight(e.data);
+  if (!h) return;
+  if (!height && frame.parentElement) frame.parentElement.style.minHeight = '0';
+  // Кадр спустя: к этому времени embed.js уже выставил iframe новую высоту
+  if (engaged && shrankSharply(height, h)) requestAnimationFrame(() => frame.scrollIntoView({ block: 'start' }));
+  height = h;
+}
+
 if (frame) {
+  addEventListener('message', onMessage);
   // Фокус ушёл в кросс-доменный iframe: у окна срабатывает blur, activeElement становится iframe
   addEventListener('blur', () => setTimeout(() => { if (document.activeElement === frame) engaged = true; }));
   // Отключаемся при первом пересечении, даже если форму уже загрузил клик по CTA

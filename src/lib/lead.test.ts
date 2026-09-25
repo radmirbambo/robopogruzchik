@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { buildFormUrl, calcSummary, FORM_SLUGS } from './lead';
+import { buildFormUrl, calcSummary, formHeight, FORM_SLUGS, shrankSharply } from './lead';
 import { calculate } from './calc';
 
 describe('lead', () => {
@@ -47,5 +47,21 @@ describe('lead', () => {
   it('не добавляет пустые параметры', () => {
     const u = new URL(buildFormUrl('https://forms.yandex.ru/cloud/abc/', { utm: {}, page: '/' }));
     expect([...u.searchParams.keys()].sort()).toEqual(['iframe', FORM_SLUGS.page, 'theme'].sort());
+  });
+
+  it('formHeight читает высоту как embed.js и пропускает служебные сообщения (I1)', () => {
+    expect(formHeight('{"iframe-height":1326,"name":"ya-form-abc"}')).toBe(1326);
+    expect(formHeight(JSON.stringify({ 'iframe-height': '180' }))).toBe(180);
+    for (const d of ['loading', 'ping', '{"name":"ya-form-abc","message":"ping"}', '{"iframe-height":0}', 'null', '5', '', undefined, { 'iframe-height': 900 }])
+      expect(formHeight(d)).toBeNull();
+  });
+
+  it('shrankSharply: только резкое сжатие (> 40 %), не первая высота и не мелкие изменения (I1)', () => {
+    expect(shrankSharply(1326, 180)).toBe(true);
+    expect(shrankSharply(1000, 590)).toBe(true);
+    expect(shrankSharply(1000, 600)).toBe(false);
+    expect(shrankSharply(1326, 1290)).toBe(false);
+    expect(shrankSharply(1300, 1400)).toBe(false);
+    expect(shrankSharply(0, 180)).toBe(false);
   });
 });
